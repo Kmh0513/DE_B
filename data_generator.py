@@ -10,9 +10,9 @@ from database import SessionLocal
 
 def generate_random_production_data():
     return ProductionBase(
-        date=(datetime.now() - timedelta(days=random.randint(0, 30))).date(),
-        item_id=random.randint(1, 100),
-        item_name=f"Item{random.randint(1, 100)}",
+        date=datetime.now().date(),
+        item_id=random.randint(1, 10),
+        item_name=f"Item{random.randint(1, 10)}",
         category=f"Category{random.randint(1, 10)}",
         price=round(random.uniform(10.0, 500.0), 2),
         standard=f"Standard{random.randint(1, 5)}",
@@ -52,9 +52,9 @@ def insert_production_data(db: Session, production_data: ProductionBase):
 
 def generate_random_inventory_data():
     return InventoryManagementBase(
-        date=(datetime.now() - timedelta(days=random.randint(0, 30))).date(),
-        item_id=random.randint(1, 100),
-        item_name=f"Item{random.randint(1, 100)}",
+        date=datetime.now().date(),
+        item_id=random.randint(1, 10),
+        item_name=f"Item{random.randint(1, 10)}",
         category=f"Category{random.randint(1, 10)}",
         price=round(random.uniform(10.0, 500.0), 2),
         standard=f"Standard{random.randint(1, 5)}",

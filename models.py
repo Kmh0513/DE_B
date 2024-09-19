@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, Float
+from sqlalchemy import Column, Integer, String, Date, Time, Float
 from database import Base
 
 class Plan(Base):
@@ -7,13 +7,7 @@ class Plan(Base):
     id = Column(Integer, primary_key=True, index=True)
     year = Column(Integer)
     month = Column(Integer)
-    item_id = Column(Integer)
     item_name = Column(String(100))
-    category = Column(String(100))
-    price = Column(Float)
-    standard = Column(String(100))
-    module_name = Column(String(100))
-    line = Column(String)
     plan_quantity = Column(Integer)
     
 

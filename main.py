@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import crud, models, schemas, datetime
 from database import get_db
@@ -11,8 +11,12 @@ app = FastAPI()
 def create_plan(plan: schemas.PlanBase, db: Session = Depends(get_db)):
     return crud.create_plan(db=db, plan=plan)
 
+@app.get("/plans/all", response_model=List[schemas.PlanBase])
+def get_plans(db: Session = Depends(get_db)):
+    return crud.get_plans(db=db)
+
 @app.get("/plans/", response_model=schemas.PlanResponse)
-def get_plans(year: int, month: int, db: Session = Depends(get_db)):
+def get_all_plans(year: int, month: int, db: Session = Depends(get_db)):
     return crud.get_all_plans(db=db, year=year, month=month)
 
 # Production Endpoints
@@ -30,6 +34,10 @@ def get_production(production_id: int, db: Session = Depends(get_db)):
 @app.get("/productions/", response_model=List[schemas.ProductionBase])
 def get_all_productions(db: Session = Depends(get_db)):
     return crud.get_all_productions(db=db)
+
+@app.get("/production/latest", response_model=schemas.ProductionBase)
+def get_latest_production_data(db: Session = Depends(get_db)):
+    return crud.get_latest_production(db)
 
 # Inventory Management Endpoints
 @app.post("/inventories/", response_model=schemas.InventoryManagementBase)

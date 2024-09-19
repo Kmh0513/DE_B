@@ -1,21 +1,16 @@
 from sqlalchemy.orm import Session
 from models import Plan, Production, InventoryManagement
 import schemas
-from sqlalchemy import func
+from sqlalchemy import func, desc
 from typing import List
+from datetime import datetime, timedelta
 
 # Plan CRUD
 def create_plan(db: Session, plan: schemas.PlanBase):
     db_plan = Plan(
         year=plan.year,
         month=plan.month,
-        item_id=plan.item_id,
         item_name=plan.item_name,
-        category=plan.category,
-        price=plan.price,
-        standard=plan.standard,
-        module_name=plan.module_name,
-        line=plan.line,
         plan_quantity=plan.plan_quantity
     )
     db.add(db_plan)
@@ -23,13 +18,20 @@ def create_plan(db: Session, plan: schemas.PlanBase):
     db.refresh(db_plan)
     return db_plan
 
+def get_plans(db: Session):
+    return db.query(Plan).all()
+def get_date_range(year: int, month: int):
+    start_date = datetime(year, month, 1)
+    end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
+    return start_date, end_date
+
 def get_all_plans(db: Session, year: int, month: int) -> schemas.PlanResponse:
+    start_date, end_date = get_date_range(year, month)
     total_plan_quantity = db.query(Plan).filter(Plan.year == year, Plan.month == month).with_entities(func.sum(Plan.plan_quantity)).scalar() or 0
-    total_business_plan = db.query(Plan).filter(Plan.year == year, Plan.month == month).with_entities(func.sum(Plan.plan_quantity * Plan.price)).scalar() or 0
+    total_business_plan = db.query(func.sum(Plan.plan_quantity * Production.price)).join(Production, Plan.item_name == Production.item_name).filter(Plan.year == year, Plan.month == month).scalar() or 0
 
-    total_production_quantity = db.query(Production).filter(Production.date.between(f'{year}-{month:02d}-01', f'{year}-{month:02d}-31')).with_entities(func.sum(Production.production_quantity)).scalar() or 0
-
-    total_business_actual = db.query(Production).filter(Production.date.between(f'{year}-{month:02d}-01', f'{year}-{month:02d}-31')).with_entities(func.sum(Production.production_quantity * Production.price)).scalar() or 0
+    total_production_quantity = db.query(func.sum(Production.production_quantity)).filter(Production.date.between(start_date.date(), end_date.date())).scalar() or 0
+    total_business_actual = db.query(func.sum(Production.production_quantity * Production.price)).filter(Production.date.between(start_date.date(), end_date.date())).scalar() or 0
 
     production_achievement_rate = (total_production_quantity / total_plan_quantity) * 100 if total_plan_quantity > 0 else 0
     business_achievement_rate = (total_business_actual / total_business_plan) * 100 if total_business_plan > 0 else 0
@@ -75,6 +77,9 @@ def get_production(db: Session, production_id: int):
 
 def get_all_productions(db: Session):
     return db.query(Production).all()
+
+def get_latest_production(db: Session):
+    return db.query(Production).order_by(desc(Production.date)).first()
 
 # InventoryManagement CRUD
 def create_inventory_management(db: Session, inventory: schemas.InventoryManagementBase):

@@ -5,13 +5,7 @@ from datetime import date, time
 class PlanBase(BaseModel):
     year: int
     month: int
-    item_id: int
     item_name: str
-    category: str
-    price: float
-    standard: str
-    module_name: str
-    line: Optional[str] = None
     plan_quantity: int
 
 
