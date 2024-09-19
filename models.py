@@ -9,7 +9,7 @@ class Plan(Base):
     month = Column(Integer)
     item_name = Column(String(100))
     plan_quantity = Column(Integer)
-    
+    account_idx = Column(Integer)
 
 
 class Production(Base):
@@ -32,6 +32,7 @@ class Production(Base):
     bad_production_type = Column(String(100))
     punching_quantity = Column(Integer)
     not_module_time = Column(Time)
+    account_idx = Column(Integer)
 
 class InventoryManagement(Base):
     __tablename__ = "inventory_managements"
@@ -49,4 +50,4 @@ class InventoryManagement(Base):
     quantity_shipped = Column(Integer)
     current_stock = Column(Integer)
     current_LOT_stock = Column(Integer)
-
+    account_idx = Column(Integer)

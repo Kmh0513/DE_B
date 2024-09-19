@@ -45,7 +45,8 @@ def insert_production_data(db: Session, production_data: ProductionBase):
         bad_production=production_data.bad_production,
         bad_production_type=production_data.bad_production_type,
         punching_quantity=production_data.punching_quantity,
-        not_module_time=production_data.not_module_time
+        not_module_time=production_data.not_module_time,
+        account_idx=production_data.account_idx
     )
     db.add(db_production)
     db.commit()
@@ -79,7 +80,8 @@ def insert_inventory_data(db: Session, Invetory_data: InventoryManagementBase):
         defective_quantity_received=Invetory_data.defective_quantity_received,
         quantity_shipped=Invetory_data.quantity_shipped,
         current_stock=Invetory_data.current_stock,
-        current_LOT_stock=Invetory_data.current_LOT_stock
+        current_LOT_stock=Invetory_data.current_LOT_stock,
+        account_idx=Invetory_data.account_idx
     )
     db.add(db_inventory)
     db.commit()

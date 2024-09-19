@@ -7,7 +7,7 @@ class PlanBase(BaseModel):
     month: int
     item_name: str
     plan_quantity: int
-
+    account_idx: int = 1
 
 class ProductionBase(BaseModel):
     date: date
@@ -26,7 +26,7 @@ class ProductionBase(BaseModel):
     bad_production_type: Optional[str] = None
     punching_quantity: int
     not_module_time: time
-
+    account_idx: int = 1
 
 class InventoryManagementBase(BaseModel):
     date: date
@@ -41,6 +41,7 @@ class InventoryManagementBase(BaseModel):
     quantity_shipped: int
     current_stock: int
     current_LOT_stock: int
+    account_idx: int = 1
 
 class PlanResponse(BaseModel):
     total_plan_quantity: int

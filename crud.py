@@ -11,7 +11,8 @@ def create_plan(db: Session, plan: schemas.PlanBase):
         year=plan.year,
         month=plan.month,
         item_name=plan.item_name,
-        plan_quantity=plan.plan_quantity
+        plan_quantity=plan.plan_quantity,
+        account_idx = plan.account_idx
     )
     db.add(db_plan)
     db.commit()
@@ -65,7 +66,8 @@ def create_production(db: Session, production: schemas.ProductionBase):
         bad_production=production.bad_production,
         bad_production_type=production.bad_production_type,
         punching_quantity=production.punching_quantity,
-        not_module_time=production.not_module_time
+        not_module_time=production.not_module_time,
+        account_idx=production.account_idx
     )
     db.add(db_production)
     db.commit()
@@ -95,7 +97,8 @@ def create_inventory_management(db: Session, inventory: schemas.InventoryManagem
         defective_quantity_received=inventory.defective_quantity_received,
         quantity_shipped=inventory.quantity_shipped,
         current_stock=inventory.current_stock,
-        current_LOT_stock=inventory.current_LOT_stock
+        current_LOT_stock=inventory.current_LOT_stock,
+        account_idx=inventory.account_idx
     )
     db.add(db_inventory)
     db.commit()
