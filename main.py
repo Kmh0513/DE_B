@@ -15,9 +15,9 @@ def create_plan(plan: schemas.PlanBase, db: Session = Depends(get_db)):
 def get_plans(db: Session = Depends(get_db)):
     return crud.get_plans(db=db)
 
-@app.get("/plans/", response_model=schemas.PlanResponse)
-def get_all_plans(year: int, month: int, db: Session = Depends(get_db)):
-    return crud.get_all_plans(db=db, year=year, month=month)
+@app.get("/plans/{year}", response_model=List[schemas.PlanResponse])
+def read_plans(year: int, db: Session = Depends(get_db)):
+    return crud.get_all_plans_for_year(db, year)
 
 # Production Endpoints
 @app.post("/productions/", response_model=schemas.ProductionBase)

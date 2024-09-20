@@ -11,7 +11,7 @@ from database import SessionLocal
 def generate_random_production_data():
     target_quantity = random.randint(200, 500)
     produced_quantity = random.randint(1, target_quantity) 
-    production_efficiency =int(produced_quantity / target_quantity * 100)
+    production_efficiency = (produced_quantity / target_quantity) * 100
     operating_time = timedelta(hours=random.randint(0, 23), minutes=random.randint(0, 59))
     non_operating_time = timedelta(hours=random.randint(0, 23), minutes=random.randint(0, 59))
     total_time = operating_time + non_operating_time
@@ -27,12 +27,12 @@ def generate_random_production_data():
         model=f"Model{random.randint(1, 5)}",
         target_quantity=target_quantity,
         produced_quantity=produced_quantity,
-        production_efficiency=production_efficiency,
+        production_efficiency=int(production_efficiency),
         equipment=f"Equipment{random.randint(1, 10)}",
         operating_time=(datetime.min + operating_time).time(),  # time 객체로 변환
         non_operating_time=(datetime.min + non_operating_time).time(),  # time 객체로 변환
         shift=f"Shift{random.randint(1, 3)}",
-        equipment_efficiency=equipment_efficiency,
+        equipment_efficiency=int(equipment_efficiency),
         specification=f"Specification{random.randint(1, 5)}"
     )
 
@@ -63,35 +63,35 @@ def generate_random_inventory_data():
     item_name = f"Item{item_number}"
     price = round(random.uniform(10.0, 100.0), 2)
     basic_quantity = random.randint(1, 100)
-    quantity_received = random.randint(0, 100)
-    defective_quantity_received = random.randint(0, 20)
-    quantity_shipped = random.randint(0, 100)
-    current_stock = random.randint(0, 200)
-    current_LOT_stock = random.randint(0, 200)
+    in_quantity = random.randint(0, 100)
+    defective_in_quantity = random.randint(0, 20)
+    out_quantity = random.randint(0, 100)
+    current_quantity = random.randint(0, 200)
+    lot_current_quantity = random.randint(0, 200)
     basic_amount = basic_quantity * price
-    received_amount = quantity_received * price
-    defective_received_amount = defective_quantity_received * price
-    shipped_amount = quantity_shipped * price
-    current_amount = current_stock * price
+    in_amount = in_quantity * price
+    defective_in_amount = defective_in_quantity * price
+    out_amount = out_quantity * price
+    current_amount = current_quantity * price
     adjustment_quantity = random.randint(-50, 50)
-    difference_quantity = current_stock - current_LOT_stock
+    difference_quantity = current_quantity - lot_current_quantity
 
     return InventoryManagementBase(
         date=datetime.now().date(),
-        item_id=item_number,
+        item_number=item_number,
         item_name=item_name,
         price=price,
         basic_quantity=basic_quantity,
         basic_amount=basic_amount,
-        in_quantity=quantity_received,
-        in_amount=received_amount,
-        defective_in_quantity=defective_quantity_received,
-        defective_in_amount=defective_received_amount,
-        out_quantity=quantity_shipped,
-        out_amount=shipped_amount,
-        current_quantity=current_stock,
+        in_quantity=in_quantity,
+        in_amount=in_amount,
+        defective_in_quantity=defective_in_quantity,
+        defective_in_amount=defective_in_amount,
+        out_quantity=out_quantity,
+        out_amount=out_amount,
+        current_quantity=current_quantity,
         current_amount=current_amount,
-        lot_current_quantity=current_LOT_stock,
+        lot_current_quantity=lot_current_quantity,
         adjustment_quantity=adjustment_quantity,
         difference_quantity=difference_quantity
     )

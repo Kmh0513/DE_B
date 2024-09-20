@@ -53,9 +53,9 @@ class InventoryManagementBase(BaseModel):
 class PlanResponse(BaseModel):
     year: int
     month: int
-    prod_plan: int
+    prod_plan: float
     business_plan: float
-    prod_amount: int
+    prod_amount: float
     business_amount: float
     production_achievement_rate: float
     business_achievement_rate: float

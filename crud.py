@@ -29,27 +29,44 @@ def get_date_range(year: int, month: int):
     end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
     return start_date, end_date
 
-def get_all_plans(db: Session, year: int, month: int) -> schemas.PlanResponse:
-    start_date, end_date = get_date_range(year, month)
-    prod_plan = db.query(func.sum(Plan.inventory)).filter(Plan.year == year, Plan.month == month).scalar() or 0
-    business_plan = db.query(func.sum(Plan.inventory * Plan.price)).filter(Plan.year == year, Plan.month == month).scalar() or 0
+def get_all_plans_for_year(db: Session, year: int) -> List[schemas.PlanResponse]:
+    plans_for_year = []
 
-    prod_amount = db.query(func.sum(Production.produced_quantity)).filter(Production.date.between(start_date.date(), end_date.date())).scalar() or 0
-    business_amount = db.query(func.sum(Production.produced_quantity * Plan.price)).join(Production, Plan.item_name == Production.item_name).filter(Production.date.between(start_date.date(), end_date.date())).scalar() or 0
+    # 1월부터 12월까지 각 월의 데이터를 계산
+    for month in range(1, 13):
+        start_date, end_date = get_date_range(year, month)
 
-    production_achievement_rate = (prod_amount / prod_plan) * 100 if prod_plan > 0 else 0
-    business_achievement_rate = (business_amount / business_plan) * 100 if business_plan > 0 else 0
+        # 월별 계획된 생산량과 사업 계획
+        prod_plan = db.query(func.sum(Plan.inventory)).filter(Plan.year == year, Plan.month == month).scalar() or 0
+        business_plan = db.query(func.sum(Plan.inventory * Plan.price)).filter(Plan.year == year, Plan.month == month).scalar() or 0
 
-    return schemas.PlanResponse(
-        year=year,
-        month=month,
-        prod_plan=prod_plan,
-        business_plan=business_plan,
-        prod_amount=prod_amount,
-        business_amount=business_amount,
-        production_achievement_rate=production_achievement_rate,
-        business_achievement_rate=business_achievement_rate
-    )
+        # 월별 실제 생산량 및 사업 실적
+        prod_amount = db.query(func.sum(Production.produced_quantity)).filter(Production.date.between(start_date.date(), end_date.date())).scalar() or 0
+        business_amount = db.query(func.sum(Production.produced_quantity * Plan.price))\
+            .select_from(Production)\
+            .join(Plan, Plan.item_name == Production.item_name)\
+            .filter(Production.date.between(start_date.date(), end_date.date()))\
+            .scalar() or 0
+
+        # 생산 달성률 및 사업 달성률 계산
+        production_achievement_rate = (prod_amount / prod_plan) * 100 if prod_plan > 0 else 0
+        business_achievement_rate = (business_amount / business_plan) * 100 if business_plan > 0 else 0
+
+        # 해당 월의 데이터 저장
+        monthly_plan = schemas.PlanResponse(
+            year=year,
+            month=month,
+            prod_plan=prod_plan,
+            business_plan=business_plan,
+            prod_amount=prod_amount,
+            business_amount=business_amount,
+            production_achievement_rate=production_achievement_rate,
+            business_achievement_rate=business_achievement_rate
+        )
+
+        plans_for_year.append(monthly_plan)
+
+    return plans_for_year
 
 # Production CRUD
 def create_production(db: Session, production: schemas.ProductionBase):
