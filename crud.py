@@ -10,8 +10,11 @@ def create_plan(db: Session, plan: schemas.PlanBase):
     db_plan = Plan(
         year=plan.year,
         month=plan.month,
+        item_number=plan.item_number,
         item_name=plan.item_name,
-        plan_quantity=plan.plan_quantity,
+        inventory=plan.inventory,
+        model=plan.model,
+        price=plan.price,
         account_idx = plan.account_idx
     )
     db.add(db_plan)
@@ -28,45 +31,44 @@ def get_date_range(year: int, month: int):
 
 def get_all_plans(db: Session, year: int, month: int) -> schemas.PlanResponse:
     start_date, end_date = get_date_range(year, month)
-    total_plan_quantity = db.query(Plan).filter(Plan.year == year, Plan.month == month).with_entities(func.sum(Plan.plan_quantity)).scalar() or 0
-    total_business_plan = db.query(func.sum(Plan.plan_quantity * Production.price)).join(Production, Plan.item_name == Production.item_name).filter(Plan.year == year, Plan.month == month).scalar() or 0
+    prod_plan = db.query(func.sum(Plan.inventory)).filter(Plan.year == year, Plan.month == month).scalar() or 0
+    business_plan = db.query(func.sum(Plan.inventory * Plan.price)).filter(Plan.year == year, Plan.month == month).scalar() or 0
 
-    total_production_quantity = db.query(func.sum(Production.production_quantity)).filter(Production.date.between(start_date.date(), end_date.date())).scalar() or 0
-    total_business_actual = db.query(func.sum(Production.production_quantity * Production.price)).filter(Production.date.between(start_date.date(), end_date.date())).scalar() or 0
+    prod_amount = db.query(func.sum(Production.produced_quantity)).filter(Production.date.between(start_date.date(), end_date.date())).scalar() or 0
+    business_amount = db.query(func.sum(Production.produced_quantity * Plan.price)).join(Production, Plan.item_name == Production.item_name).filter(Production.date.between(start_date.date(), end_date.date())).scalar() or 0
 
-    production_achievement_rate = (total_production_quantity / total_plan_quantity) * 100 if total_plan_quantity > 0 else 0
-    business_achievement_rate = (total_business_actual / total_business_plan) * 100 if total_business_plan > 0 else 0
+    production_achievement_rate = (prod_amount / prod_plan) * 100 if prod_plan > 0 else 0
+    business_achievement_rate = (business_amount / business_plan) * 100 if business_plan > 0 else 0
 
     return schemas.PlanResponse(
-        total_plan_quantity=total_plan_quantity,
-        total_business_plan=total_business_plan,
-        total_production_quantity=total_production_quantity,
-        total_business_actual=total_business_actual,
-        production_achievement_rate=production_achievement_rate,
-        business_achievement_rate=business_achievement_rate,
         year=year,
-        month=month
+        month=month,
+        prod_plan=prod_plan,
+        business_plan=business_plan,
+        prod_amount=prod_amount,
+        business_amount=business_amount,
+        production_achievement_rate=production_achievement_rate,
+        business_achievement_rate=business_achievement_rate
     )
 
 # Production CRUD
 def create_production(db: Session, production: schemas.ProductionBase):
     db_production = Production(
         date=production.date,
-        item_id=production.item_id,
-        item_name=production.item_name,
-        category=production.category,
-        price=production.price,
-        standard=production.standard,
-        module_name=production.module_name,
         line=production.line,
-        worker_name=production.worker_name,
-        module_time=production.module_time,
-        working_time=production.working_time,
-        production_quantity=production.production_quantity,
-        bad_production=production.bad_production,
-        bad_production_type=production.bad_production_type,
-        punching_quantity=production.punching_quantity,
-        not_module_time=production.not_module_time,
+        operator=production.operator,
+        item_number=production.item_number,
+        item_name=production.item_name,
+        model=production.model,
+        target_quantity=production.target_quantity,
+        produced_quantity=production.produced_quantity,
+        bad_production_type=production.production_efficiency,
+        equipment=production.equipment,
+        operating_time=production.operating_time,
+        non_operating_time=production.non_operating_time,
+        shift=production.shift,
+        equipment_efficiency=production.equipment_efficiency,
+        specification=production.specification,
         account_idx=production.account_idx
     )
     db.add(db_production)
@@ -87,17 +89,22 @@ def get_latest_production(db: Session):
 def create_inventory_management(db: Session, inventory: schemas.InventoryManagementBase):
     db_inventory = InventoryManagement(
         date=inventory.date,
-        item_id=inventory.item_id,
+        item_number=inventory.item_number,
         item_name=inventory.item_name,
-        category=inventory.category,
         price=inventory.price,
-        standard=inventory.standard,
         basic_quantity=inventory.basic_quantity,
-        quantity_received=inventory.quantity_received,
-        defective_quantity_received=inventory.defective_quantity_received,
-        quantity_shipped=inventory.quantity_shipped,
-        current_stock=inventory.current_stock,
-        current_LOT_stock=inventory.current_LOT_stock,
+        basic_amount=inventory.basic_amount,
+        in_quantity=inventory.in_quantity,
+        in_amount=inventory.in_amount,
+        defective_in_quantity=inventory.defective_in_quantity,
+        defective_in_amount=inventory.defective_in_amount,
+        out_quantity=inventory.out_quantity,
+        out_amount=inventory.out_amount,
+        adjustment_quantity=inventory.adjustment_quantity,
+        current_quantity=inventory.current_quantity,
+        current_amount=inventory.current_amount,
+        lot_current_quantity=inventory.lot_current_quantity,
+        difference_quantity=inventory.difference_quantity,
         account_idx=inventory.account_idx
     )
     db.add(db_inventory)

@@ -5,50 +5,57 @@ from datetime import date, time
 class PlanBase(BaseModel):
     year: int
     month: int
+    item_number: int
     item_name: str
-    plan_quantity: int
+    inventory: int
+    model: str
+    price: float
     account_idx: int = 1
 
 class ProductionBase(BaseModel):
     date: date
-    item_id: int
-    item_name: str
-    category: str
-    price: float
-    standard: str
-    module_name: str
     line: Optional[str] = None
-    worker_name: Optional[str] = None
-    module_time: time
-    working_time: time
-    production_quantity: int
-    bad_production: int
-    bad_production_type: Optional[str] = None
-    punching_quantity: int
-    not_module_time: time
+    operator: Optional[str] = None
+    item_number: int
+    item_name: str
+    model: str
+    target_quantity: int
+    produced_quantity: int
+    production_efficiency: int
+    equipment: str
+    operating_time: time
+    non_operating_time: time
+    shift: str
+    equipment_efficiency: int
+    specification: str
     account_idx: int = 1
 
 class InventoryManagementBase(BaseModel):
     date: date
-    item_id: int
+    item_number: int
     item_name: str
-    category: str
     price: float
-    standard: str
     basic_quantity: int
-    quantity_received: int
-    defective_quantity_received: int
-    quantity_shipped: int
-    current_stock: int
-    current_LOT_stock: int
+    basic_amount: float
+    in_quantity: int
+    in_amount: float
+    defective_in_quantity: int
+    defective_in_amount: float
+    out_quantity: int
+    out_amount: float
+    adjustment_quantity: int
+    current_quantity: int
+    current_amount: float
+    lot_current_quantity: int
+    difference_quantity: int
     account_idx: int = 1
 
 class PlanResponse(BaseModel):
-    total_plan_quantity: int
-    total_business_plan: float
-    total_production_quantity: int
-    total_business_actual: float
-    production_achievement_rate: float
-    business_achievement_rate: float
     year: int
     month: int
+    prod_plan: int
+    business_plan: float
+    prod_amount: int
+    business_amount: float
+    production_achievement_rate: float
+    business_achievement_rate: float
