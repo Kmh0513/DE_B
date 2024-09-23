@@ -58,3 +58,17 @@ class InventoryManagement(Base):
     lot_current_quantity = Column(Integer)
     difference_quantity = Column(Integer)
     account_idx = Column(Integer)
+
+class Material(Base):
+    __tablename__ = "materials"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date)
+    client = Column(String(100))
+    item_number = Column(Integer)
+    item_name = Column(String(100))
+    item_categoty = Column(String(100))
+    model = Column(String(100))
+    process = Column(String(100))
+    quantity = Column(Integer)
+    account_idx = Column(Integer)

@@ -2,7 +2,18 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import date, time
 
+class PlanCreate(BaseModel):
+    year: int
+    month: int
+    item_number: int
+    item_name: str
+    inventory: int
+    model: str
+    price: float
+    account_idx: int = 1
+
 class PlanBase(BaseModel):
+    id: int
     year: int
     month: int
     item_number: int
@@ -62,6 +73,17 @@ class InventoryManagementBase(BaseModel):
     difference_quantity: int
     account_idx: int = 1
 
+class MaterialBase(BaseModel):
+    date: date
+    client: str
+    item_number: int
+    item_name: str
+    item_category: str
+    model: str
+    process: str
+    quantity: int
+    account_idx: int = 1
+
 class PlanResponse(BaseModel):
     year: int
     month: int
@@ -71,3 +93,23 @@ class PlanResponse(BaseModel):
     business_amount: float
     production_achievement_rate: float
     business_achievement_rate: float
+
+class MaterialResponse(BaseModel):
+    year: int
+    month: int
+    client: str
+    previous_amount: int
+    current_amount: int
+    gorowth_rate: float
+
+class MaterialUpdate(BaseModel):
+    client: Optional[str] = None
+    item_number: Optional[int] = None
+    item_name: Optional[str] = None
+    item_category: Optional[str] = None
+    model: Optional[str] = None
+    process: Optional[str] = None
+    quantity: Optional[int] = None
+    
+    class Config:
+        orm_mode = True

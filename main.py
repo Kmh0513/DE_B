@@ -7,8 +7,8 @@ from typing import List
 
 app = FastAPI()
 
-@app.post("/plans/", response_model=schemas.PlanBase)
-def create_plan(plan: schemas.PlanBase, db: Session = Depends(get_db)):
+@app.post("/plans/", response_model=schemas.PlanCreate)
+def create_plan(plan: schemas.PlanCreate, db: Session = Depends(get_db)):
     return crud.create_plan(db=db, plan=plan)
 
 @app.get("/plans/all", response_model=List[schemas.PlanBase])
@@ -68,3 +68,29 @@ def get_inventory(inventory_id: int, db: Session = Depends(get_db)):
 @app.get("/inventories/", response_model=List[schemas.InventoryManagementBase])
 def get_all_inventories(db: Session = Depends(get_db)):
     return crud.get_all_inventories(db=db)
+
+@app.post("/materials/", response_model=schemas.MaterialBase)
+def create_material(material: schemas.MaterialBase, db: Session = Depends(get_db)):
+    return crud.create_materials(db=db, material=material)
+
+@app.get("/materials/all", response_model=List[schemas.MaterialBase])
+def get_materials(db: Session = Depends(get_db)):
+    return crud.get_materials(db=db)
+
+@app.put("/materials/{material_id}", response_model=schemas.MaterialUpdate)
+def update_material_route(material_id: int, material_update: schemas.MaterialUpdate, db: Session = Depends(get_db)):
+    updated_plan = crud.update_materials(db, material_id, material_update)
+    if not updated_plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    return updated_plan
+
+@app.delete("/materials/{material_id}", response_model=schemas.MaterialUpdate)
+def delete_material_route(material_id: int, db: Session = Depends(get_db)):
+    deleted_material = crud.delete_material(db, material_id)
+    if not deleted_material:
+        raise HTTPException(status_code=404, detail="Material not found")
+    return {"detail": "Material deleted"}
+
+@app.get("/materials/{year}/{month}", response_model=List[schemas.MaterialResponse])
+def read_material(year: int, month: int, db: Session = Depends(get_db)):
+    return crud.get_material_for_month(db, year, month)

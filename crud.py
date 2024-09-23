@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Plan, Production, InventoryManagement
+from models import Plan, Production, InventoryManagement, Material
 import schemas
 from sqlalchemy import func, desc
 from typing import List
@@ -158,3 +158,49 @@ def get_inventory(db: Session, inventory_id: int):
 #inventories전체
 def get_all_inventories(db: Session):
     return db.query(InventoryManagement).all()
+
+def create_materials(db: Session, material: schemas.MaterialBase):
+    db_material = Material(
+        date=material.date,
+        client=material.client,
+        item_number=material.item_number,
+        item_name=material.item_name,
+        item_category=material.item_category,
+        model=material.model,
+        process=material.process,
+        quantity=material.quantity,
+        account_idx=material.account_idx
+    )
+    db.add(db_material)
+    db.commit()
+    db.refresh(db_material)
+    return db_material
+
+def get_materials(db: Session):
+    return db.query(Material).all()
+
+def update_material(db: Session, material_id: int, material_update: schemas.MaterialUpdate):
+    material = db.query(Material).filter(Material.id == material_id).first()
+    
+    if not material:
+        return None  
+    
+    for var, value in vars(material_update).items():
+        setattr(material, var, value)  
+        
+    db.commit()
+    db.refresh(material)  
+    return material
+
+def delete_material(db: Session, material_id: int):
+    material = db.query(Material).filter(Material.id == material_id).first()
+    
+    if not material:
+        return None
+    
+    db.delete(material)
+    db.commit()
+    return material
+
+def get_material_for_month(db: Session, year: int, month: int):
+    return 
