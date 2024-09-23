@@ -19,6 +19,20 @@ def get_plans(db: Session = Depends(get_db)):
 def read_plans(year: int, db: Session = Depends(get_db)):
     return crud.get_all_plans_for_year(db, year)
 
+@app.put("/plans/{plan_id}", response_model=schemas.PlanUpdate)
+def update_plan_route(plan_id: int, plan_update: schemas.PlanUpdate, db: Session = Depends(get_db)):
+    updated_plan = crud.update_plan(db, plan_id, plan_update)
+    if not updated_plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    return updated_plan
+
+@app.delete("/plans/{plan_id}", response_model=schemas.PlanUpdate)
+def delete_plan_route(plan_id: int, db: Session = Depends(get_db)):
+    deleted_plan = crud.delete_plan(db, plan_id)
+    if not deleted_plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    return {"detail": "Plan deleted"}
+
 # Production Endpoints
 @app.post("/productions/", response_model=schemas.ProductionBase)
 def create_production(production: schemas.ProductionBase, db: Session = Depends(get_db)):

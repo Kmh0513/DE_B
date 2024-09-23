@@ -12,6 +12,18 @@ class PlanBase(BaseModel):
     price: float
     account_idx: int = 1
 
+class PlanUpdate(BaseModel):
+    year: Optional[int] = None
+    month: Optional[int] = None
+    itme_number: Optional[int] = None
+    item_name: Optional[str] = None
+    inventory: Optional[int] = None
+    model: Optional[str] = None
+    price: Optional[float] = None
+    
+    class Config:
+        orm_mode = True
+
 class ProductionBase(BaseModel):
     date: date
     line: Optional[str] = None

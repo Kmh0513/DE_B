@@ -63,7 +63,7 @@ def generate_random_inventory_data():
     item_name = f"Item{item_number}"
     price = round(random.uniform(10.0, 100.0), 2)
     basic_quantity = random.randint(1, 100)
-    in_quantity = random.randint(0, 100)
+    in_quantity = Production.produced_quantity
     defective_in_quantity = random.randint(0, 20)
     out_quantity = random.randint(0, 100)
     current_quantity = random.randint(0, 200)
