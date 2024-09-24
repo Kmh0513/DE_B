@@ -203,4 +203,44 @@ def delete_material(db: Session, material_id: int):
     return material
 
 def get_material_for_month(db: Session, year: int, month: int):
-    return 
+
+    current_start_date = datetime(year, month, 1)
+    next_month = month % 12 + 1
+    current_end_date = datetime(year, next_month, 1) - timedelta(days=1)
+
+    # 전월의 첫 번째 날과 마지막 날을 계산
+    previous_month = (month - 1) or 12
+    previous_year = year - 1 if month == 1 else year
+    previous_start_date = datetime(previous_year, previous_month, 1)
+    previous_end_date = datetime(year, month, 1) - timedelta(days=1)
+
+    # 전월 실적 및 당월 실적 조회
+    current_data = db.query(func.sum(Material.quantity*Plan.price).label("current_amount"), Material.client)\
+        .filter(Material.date >= current_start_date, Material.date <= current_end_date)\
+        .group_by(Material.client).all()
+
+    previous_data = db.query(func.sum(Material.quantity*Plan.price).label("previous_amount"), Material.client)\
+        .filter(Material.date >= previous_start_date, Material.date <= previous_end_date)\
+        .group_by(Material.client).all()
+
+    # 데이터를 매핑
+    previous_map = {data.client: data.previous_amount for data in previous_data}
+
+    results = []
+    for current in current_data:
+        previous_amount = previous_map.get(current.client, 0)
+        growth_rate = ((current.current_amount - previous_amount) / previous_amount * 100) if previous_amount else 0
+
+        # 결과를 MaterialResponse로 변환
+        result = schemas.MaterialResponse(
+            year=year,
+            month=month,
+            client=current.client,
+            previous_amount=previous_amount,
+            current_amount=current.current_amount,
+            growth_rate=growth_rate
+        )
+        results.append(result)
+    
+    return results
+

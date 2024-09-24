@@ -62,12 +62,12 @@ class InventoryManagement(Base):
 class Material(Base):
     __tablename__ = "materials"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(Date)
     client = Column(String(100))
     item_number = Column(Integer)
     item_name = Column(String(100))
-    item_categoty = Column(String(100))
+    item_category = Column(String(100))
     model = Column(String(100))
     process = Column(String(100))
     quantity = Column(Integer)

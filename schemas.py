@@ -100,7 +100,7 @@ class MaterialResponse(BaseModel):
     client: str
     previous_amount: int
     current_amount: int
-    gorowth_rate: float
+    growth_rate: Optional[float] = None
 
 class MaterialUpdate(BaseModel):
     client: Optional[str] = None
