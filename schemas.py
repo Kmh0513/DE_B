@@ -98,8 +98,8 @@ class MaterialResponse(BaseModel):
     year: int
     month: int
     client: str
-    previous_amount: int
-    current_amount: int
+    previous_amount: float
+    current_amount: float
     growth_rate: Optional[float] = None
 
 class MaterialUpdate(BaseModel):

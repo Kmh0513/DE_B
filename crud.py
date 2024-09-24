@@ -121,16 +121,16 @@ def create_production(db: Session, production: schemas.ProductionBase):
 
 def get_production(db: Session, production_id: int):
     production_get = db.query(Production).filter(Production.id == production_id).first()
-    return [plan.__dict__ for plan in production_get]
+    return  production_get.__dict__
 
 #productions전체
 def get_all_productions(db: Session):
     production_get = db.query(Production).all()
-    return [plan.__dict__ for plan in production_get]
+    return [production.__dict__ for production in production_get]
 #가장 최근 production반환
 def get_latest_production(db: Session):
-    return db.query(Production).order_by(desc(Production.date)).first()
-
+    production_get = db.query(Production).order_by(desc(Production.date)).first()
+    return production_get.__dict__
 # InventoryManagement CRUD
 def create_inventory_management(db: Session, inventory: schemas.InventoryManagementBase):
     db_inventory = InventoryManagement(
@@ -159,10 +159,13 @@ def create_inventory_management(db: Session, inventory: schemas.InventoryManagem
     return db_inventory
 
 def get_inventory(db: Session, inventory_id: int):
-    return db.query(InventoryManagement).filter(InventoryManagement.id == inventory_id).first()
+    inventory_get = db.query(InventoryManagement).filter(InventoryManagement.id == inventory_id).first()
+    return  inventory_get.__dict__
+    
 #inventories전체
 def get_all_inventories(db: Session):
-    return db.query(InventoryManagement).all()
+    inventory_get = db.query(InventoryManagement).all()
+    return [inventory.__dict__ for inventory in inventory_get]
 
 def create_materials(db: Session, material: schemas.MaterialBase):
     db_material = Material(
@@ -182,7 +185,8 @@ def create_materials(db: Session, material: schemas.MaterialBase):
     return db_material
 
 def get_materials(db: Session):
-    return db.query(Material).all()
+    material_get = db.query(Material).all()
+    return [material.__dict__ for material in material_get]
 
 def update_material(db: Session, material_id: int, material_update: schemas.MaterialUpdate):
     material = db.query(Material).filter(Material.id == material_id).first()
@@ -250,4 +254,5 @@ def get_material_for_month(db: Session, year: int, month: int):
     return results
 
 def get_all_material_invens(db: Session):
-    return db.query(MaterialInven).all()
+    material_get = db.query(MaterialInven).all()
+    return [material.__dict__ for material in material_get]
