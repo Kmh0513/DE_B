@@ -95,3 +95,7 @@ def delete_material_route(material_id: int, db: Session = Depends(get_db)):
 def read_material_performance(year: int, month: int, db: Session = Depends(get_db)):
     materials = crud.get_material_for_month(db, year, month)
     return materials
+
+@app.get("/material_invens/", response_model=List[schemas.MaterialInvenBase])
+def get_all_materialsinven(db: Session = Depends(get_db)):
+    return crud.get_all_material_invens(db=db)

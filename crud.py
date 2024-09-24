@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Plan, Production, InventoryManagement, Material
+from models import Plan, Production, InventoryManagement, Material, MaterialInven
 import schemas
 from sqlalchemy import func, desc
 from typing import List
@@ -215,11 +215,11 @@ def get_material_for_month(db: Session, year: int, month: int):
     previous_end_date = datetime(year, month, 1) - timedelta(days=1)
 
     # 전월 실적 및 당월 실적 조회
-    current_data = db.query(func.sum(Material.quantity*Plan.price).label("current_amount"), Material.client)\
+    current_data = db.query(func.sum(Material.quantity*MaterialInven.price).label("current_amount"), Material.client)\
         .filter(Material.date >= current_start_date, Material.date <= current_end_date)\
         .group_by(Material.client).all()
 
-    previous_data = db.query(func.sum(Material.quantity*Plan.price).label("previous_amount"), Material.client)\
+    previous_data = db.query(func.sum(Material.quantity*MaterialInven.price).label("previous_amount"), Material.client)\
         .filter(Material.date >= previous_start_date, Material.date <= previous_end_date)\
         .group_by(Material.client).all()
 
@@ -244,3 +244,5 @@ def get_material_for_month(db: Session, year: int, month: int):
     
     return results
 
+def get_all_material_invens(db: Session):
+    return db.query(MaterialInven).all()

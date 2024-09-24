@@ -113,3 +113,16 @@ class MaterialUpdate(BaseModel):
     
     class Config:
         orm_mode = True
+
+class MaterialInvenBase(BaseModel):
+    date: date
+    item_number: int
+    item_name: str
+    price: float
+    item_category: str
+    process: str
+    client: str
+    model: str
+    overall_status_quantity: int
+    overall_status_amount: float
+    account_idx: int = 1

@@ -72,3 +72,19 @@ class Material(Base):
     process = Column(String(100))
     quantity = Column(Integer)
     account_idx = Column(Integer)
+
+class MaterialInven(Base):
+    __tablename__ = "material_invens"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    date = Column(Date)
+    item_number = Column(Integer)
+    item_name = Column(String(100))
+    item_category = Column(String(100))
+    price = Column(Float)
+    process = Column(String(100))
+    client = Column(String(100))
+    model = Column(String(100))
+    overall_status_quantity = Column(Integer)
+    overall_status_amount = Column(Float)
+    account_idx: int = 1

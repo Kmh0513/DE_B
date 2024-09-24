@@ -4,8 +4,8 @@ from datetime import datetime, timedelta, time
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Production, InventoryManagement
-from schemas import ProductionBase, InventoryManagementBase
+from models import Production, InventoryManagement, Material, MaterialInven
+from schemas import ProductionBase, InventoryManagementBase, MaterialInvenBase
 from database import SessionLocal
 
 def generate_random_production_data():
@@ -121,15 +121,58 @@ def insert_inventory_data(db: Session, Invetory_data: InventoryManagementBase):
     db.add(db_inventory)
     db.commit()
 
+def generate_random_material_data():
+    item_number = random.randint(1, 10)
+    item_name = f"Item{item_number}"
+    item_category = f"Category{random.randint(1, 3)}"
+    price = round(random.uniform(10.0, 100.0), 2)
+    process = f"Process{random.randint(1, 5)}"
+    client = f"Client{random.randint(1, 5)}"
+    model = f"Model{random.randint(1, 5)}"
+    overall_status_quantity = random.randint(1, 100)
+    overall_status_amount = overall_status_quantity*price
+
+    return MaterialInvenBase(
+        date=datetime.now().date(),
+        item_number=item_number,
+        item_name=item_name,
+        price=price,
+        item_category=item_category,
+        process=process,
+        client=client,
+        model=model,
+        overall_status_quantity=overall_status_quantity,
+        overall_status_amount=overall_status_amount
+    )
+
+def insert_material_data(db: Session, Material_data: MaterialInvenBase):
+    
+    db_material = MaterialInven(
+        date=datetime.now().date(),
+        item_number=Material_data.item_number,
+        item_name=Material_data.item_name,
+        price=Material_data.price,
+        item_category=Material_data.item_category,
+        process=Material_data.process,
+        client=Material_data.client,
+        model=Material_data.model,
+        overall_status_quantity=Material_data.overall_status_quantity,
+        overall_status_amount=Material_data.overall_status_amount
+    )
+    db.add(db_material)
+    db.commit()
+
 def main():
     db = SessionLocal()
     try:
         while True:
             production_data = generate_random_production_data()
-            Invetory_data = generate_random_inventory_data()
+            invetory_data = generate_random_inventory_data()
+            material_inven_data = generate_random_material_data()
             insert_production_data(db, production_data)
-            insert_inventory_data(db, Invetory_data)
-            print(f"Inserted: {production_data}, {Invetory_data}")
+            insert_inventory_data(db, invetory_data)
+            insert_material_data(db, material_inven_data)
+            print(f"Inserted: {production_data}, {invetory_data}, {material_inven_data}")
             t.sleep(10)  # 10초 대기
     finally:
         db.close()
