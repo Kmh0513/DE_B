@@ -28,7 +28,8 @@ def create_plan(db: Session, plan: schemas.PlanBase):
 # plans전체
 def get_plans(db: Session):
     plan_get=db.query(Plan).all()
-    return plan_get
+    return [plan.__dict__ for plan in plan_get]
+
 # 연도별 plans 따른 데이터
 def get_all_plans_for_year(db: Session, year: int) -> List[schemas.PlanResponse]:
     plans_for_year = []
@@ -119,10 +120,13 @@ def create_production(db: Session, production: schemas.ProductionBase):
     return db_production
 
 def get_production(db: Session, production_id: int):
-    return db.query(Production).filter(Production.id == production_id).first()
+    production_get = db.query(Production).filter(Production.id == production_id).first()
+    return [plan.__dict__ for plan in production_get]
+
 #productions전체
 def get_all_productions(db: Session):
-    return db.query(Production).all()
+    production_get = db.query(Production).all()
+    return [plan.__dict__ for plan in production_get]
 #가장 최근 production반환
 def get_latest_production(db: Session):
     return db.query(Production).order_by(desc(Production.date)).first()
