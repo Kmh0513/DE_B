@@ -121,7 +121,7 @@ def create_production(db: Session, production: schemas.ProductionBase):
 
 def get_production(db: Session, production_id: int):
     production_get = db.query(Production).filter(Production.id == production_id).first()
-    return  production_get.__dict__
+    return  production_get
 
 #productions전체
 def get_all_productions(db: Session):
@@ -160,7 +160,7 @@ def create_inventory_management(db: Session, inventory: schemas.InventoryManagem
 
 def get_inventory(db: Session, inventory_id: int):
     inventory_get = db.query(InventoryManagement).filter(InventoryManagement.id == inventory_id).first()
-    return  inventory_get.__dict__
+    return  inventory_get
     
 #inventories전체
 def get_all_inventories(db: Session):

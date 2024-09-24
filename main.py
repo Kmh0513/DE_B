@@ -9,13 +9,13 @@ app = FastAPI()
 
 @app.post("/plans/", response_model=schemas.PlanCreate)
 def create_plan(plan: schemas.PlanCreate, db: Session = Depends(get_db)):
-    return crud.create_plan(db=db, plan=plan)
+    return crud.create_plan(db=db, plan=plan).__dict__
 
 @app.get("/plans/all", response_model=List[schemas.PlanBase])
 def get_plans(db: Session = Depends(get_db)):
     return crud.get_plans(db=db)
 
-@app.get("/plans/{year}", response_model=List[schemas.PlanResponse])
+@app.get("/plans_rate/{year}", response_model=List[schemas.PlanResponse])
 def read_plans(year: int, db: Session = Depends(get_db)):
     return crud.get_all_plans_for_year(db, year)
 
@@ -43,7 +43,7 @@ def get_production(production_id: int, db: Session = Depends(get_db)):
     production = crud.get_production(db=db, production_id=production_id)
     if production is None:
         raise HTTPException(status_code=404, detail="Production not found")
-    return production
+    return production.__dict__
 
 @app.get("/productions/", response_model=List[schemas.ProductionBase])
 def get_all_productions(db: Session = Depends(get_db)):
@@ -63,7 +63,7 @@ def get_inventory(inventory_id: int, db: Session = Depends(get_db)):
     inventory = crud.get_inventory(db=db, inventory_id=inventory_id)
     if inventory is None:
         raise HTTPException(status_code=404, detail="Inventory not found")
-    return inventory
+    return inventory.__dict__
 
 @app.get("/inventories/", response_model=List[schemas.InventoryManagementBase])
 def get_all_inventories(db: Session = Depends(get_db)):
