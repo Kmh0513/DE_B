@@ -27,7 +27,8 @@ def create_plan(db: Session, plan: schemas.PlanBase):
     return db_plan
 # plans전체
 def get_plans(db: Session):
-    return db.query(Plan).all()
+    plan_get=db.query(Plan).all()
+    return plan_get
 # 연도별 plans 따른 데이터
 def get_all_plans_for_year(db: Session, year: int) -> List[schemas.PlanResponse]:
     plans_for_year = []

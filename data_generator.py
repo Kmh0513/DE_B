@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, time
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Production, InventoryManagement, Material, MaterialInven
+from models import Production, InventoryManagement,  MaterialInven
 from schemas import ProductionBase, InventoryManagementBase, MaterialInvenBase
 from database import SessionLocal
 
