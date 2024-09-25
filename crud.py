@@ -6,7 +6,7 @@ from typing import List
 from datetime import datetime, timedelta
 
 #기간 계산 함수
-def get_date_range(year: int, month: int):
+def get_month_range(year: int, month: int):
     start_date = datetime(year, month, 1)
     end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
     return start_date, end_date
@@ -38,7 +38,7 @@ def get_plans_rate_for_year(db: Session, year: int) -> List[schemas.PlanResponse
     plans_for_year = []
 
     for month in range(1, 13):
-        start_date, end_date = get_date_range(year, month)
+        start_date, end_date = get_month_range(year, month)
 
         prod_plan = db.query(func.sum(Plan.inventory)).filter(Plan.year == year, Plan.month == month).scalar() or 0
         business_plan = db.query(func.sum(Plan.inventory * Plan.price)).filter(Plan.year == year, Plan.month == month).scalar() or 0
@@ -125,10 +125,21 @@ def get_all_productions(db: Session):
     production_get = db.query(Production).all()
     return [production.__dict__ for production in production_get]
 
+def get_days_production(db: Session, start_date: datetime.date, end_date: datetime.date, operator: str, item_number: int, item_name: str):
+    querys = db.query(Production).filter(Production.date.between(start_date, end_date))
+    if operator:
+        querys = querys.filter(Production.operator == operator)
+    if item_number:
+        querys = querys.filter(Production.item_number == item_number)
+    if item_name:
+        querys = querys.filter(Production.item_name == item_name)
+    
+    production_get = querys.order_by(desc(Production.id)).all()
+    return [production.__dict__ for production in production_get]
+
 #특정날짜 production반환
-def get_day_production(db: Session, year: int, month: int, day: int):
-    get_date = datetime(year, month, day).date()
-    production_get = db.query(Production).filter(Production.date == get_date).order_by(desc(Production.id)).limit(20).all()
+def get_day_production(db: Session, date: datetime.date):
+    production_get = db.query(Production).filter(Production.date == date).order_by(desc(Production.id)).limit(20).all()
     return [production.__dict__ for production in production_get]
 
 #inventory_management CRUD
