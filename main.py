@@ -6,17 +6,20 @@ from database import get_db
 from typing import List
 
 app = FastAPI()
+@app.get("/")
+def root():
+    return None
 
 #plan 엔드포인트
 @app.post("/plans/", response_model=schemas.PlanCreate)
 def create_plan(plan: schemas.PlanCreate, db: Session = Depends(get_db)):
     return crud.create_plan(db, plan)
 
-@app.get("/plans/all", response_model=List[schemas.PlanBase])
+@app.get("/plans/all/", response_model=List[schemas.PlanBase])
 def get_all_plans(db: Session = Depends(get_db)):
     return crud.get_all_plans(db)
 
-@app.get("/plans/rate{year}", response_model=List[schemas.PlanResponse])
+@app.get("/plans/rate/{year}", response_model=List[schemas.PlanResponse])
 def get_plans_rate(year: int, db: Session = Depends(get_db)):
     return crud.get_plans_rate_for_year(db, year)
 
@@ -39,11 +42,11 @@ def delete_plan_route(plan_id: int, db: Session = Depends(get_db)):
 def create_production(production: schemas.ProductionCreate, db: Session = Depends(get_db)):
     return crud.create_production(db, production)
 
-@app.get("/productions/all", response_model=List[schemas.ProductionBase])
+@app.get("/productions/all/", response_model=List[schemas.ProductionBase])
 def get_all_productions(db: Session = Depends(get_db)):
     return crud.get_all_productions(db)
 
-@app.get("/productions/day{year},{month},{day}", response_model=List[schemas.ProductionBase])
+@app.get("/productions/day/{year},{month},{day}", response_model=List[schemas.ProductionBase])
 def get_day_production_data(year: int, month: int, day: int, db: Session = Depends(get_db)):
     production = crud.get_day_production(db, year, month, day)
     if production is None:
@@ -62,7 +65,7 @@ def get_production(production_id: int, db: Session = Depends(get_db)):
 def create_inventory_management(inventory: schemas.InventoryManagementCreate, db: Session = Depends(get_db)):
     return crud.create_inventory_management(db=db, inventory=inventory)
 
-@app.get("/inventories/all", response_model=List[schemas.InventoryManagementBase])
+@app.get("/inventories/all/", response_model=List[schemas.InventoryManagementBase])
 def get_all_inventories(db: Session = Depends(get_db)):
     return crud.get_all_inventories(db=db)
 
@@ -78,11 +81,11 @@ def get_inventory(inventory_id: int, db: Session = Depends(get_db)):
 def create_material(material: schemas.MaterialCreate, db: Session = Depends(get_db)):
     return crud.create_materials(db=db, material=material)
 
-@app.get("/materials/all", response_model=List[schemas.MaterialBase])
+@app.get("/materials/all/", response_model=List[schemas.MaterialBase])
 def get_all_materials(db: Session = Depends(get_db)):
     return crud.get_all_materials(db=db)
 
-@app.get("/materials/rate{year},{month}", response_model=List[schemas.MaterialResponse])
+@app.get("/materials/rate/{year},{month}", response_model=List[schemas.MaterialResponse])
 def get_material_rate(year: int, month: int, db: Session = Depends(get_db)):
     materials = crud.get_material_rate_for_month(db, year, month)
     return materials
@@ -101,6 +104,6 @@ def delete_material_route(material_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Material not found")
     return {"detail": "Material deleted"}
 
-@app.get("/material_invens/all", response_model=List[schemas.MaterialInvenCreate])
+@app.get("/material_invens/all/", response_model=List[schemas.MaterialInvenCreate])
 def get_all_materialsinven(db: Session = Depends(get_db)):
     return crud.get_all_material_invens(db=db)
