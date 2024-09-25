@@ -6,7 +6,7 @@ from typing import List
 from datetime import datetime, timedelta
 
 #기간 계산 함수
-def get_date_range(year: int, month: int, day: int):
+def get_date_range(year: int, month: int):
     start_date = datetime(year, month, 1)
     end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
     return start_date, end_date
@@ -102,7 +102,7 @@ def create_production(db: Session, production: schemas.ProductionCreate):
         model=production.model,
         target_quantity=production.target_quantity,
         produced_quantity=production.produced_quantity,
-        bad_production_type=production.production_efficiency,
+        production_efficiency=production.production_efficiency,
         equipment=production.equipment,
         operating_time=production.operating_time,
         non_operating_time=production.non_operating_time,
