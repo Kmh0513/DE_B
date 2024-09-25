@@ -23,6 +23,16 @@ class PlanBase(BaseModel):
     price: float
     account_idx: int = 1
 
+class PlanResponse(BaseModel):
+    year: int
+    month: int
+    prod_plan: float
+    business_plan: float
+    prod_amount: float
+    business_amount: float
+    production_achievement_rate: float
+    business_achievement_rate: float
+
 class PlanUpdate(BaseModel):
     year: Optional[int] = None
     month: Optional[int] = None
@@ -86,16 +96,6 @@ class MaterialBase(BaseModel):
     process: str
     quantity: int
     account_idx: int = 1
-
-class PlanResponse(BaseModel):
-    year: int
-    month: int
-    prod_plan: float
-    business_plan: float
-    prod_amount: float
-    business_amount: float
-    production_achievement_rate: float
-    business_achievement_rate: float
 
 class MaterialResponse(BaseModel):
     year: int

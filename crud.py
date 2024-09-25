@@ -4,16 +4,14 @@ import schemas
 from sqlalchemy import func, desc
 from typing import List
 from datetime import datetime, timedelta
-# 기간 계산 함수
+
+#기간 계산 함수
 def get_date_range(year: int, month: int, day: int):
-    if day:
-        start_date = datetime(year, month, day)
-        end_date = start_date 
-    else:
-        start_date = datetime(year, month, 1)
-        end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
+    start_date = datetime(year, month, 1)
+    end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
     return start_date, end_date
-# Plan CRUD
+
+#plan CRUD
 def create_plan(db: Session, plan: schemas.PlanBase):
     db_plan = Plan(
         year=plan.year,
@@ -29,24 +27,22 @@ def create_plan(db: Session, plan: schemas.PlanBase):
     db.commit()
     db.refresh(db_plan)
     return db_plan.__dict__
-# plans전체
+
+#plan전체
 def get_plans(db: Session):
     plan_get=db.query(Plan).all()
     return [plan.__dict__ for plan in plan_get]
 
-# 연도별 plans 따른 데이터
+#연도별 plan rate 데이터
 def get_all_plans_for_year(db: Session, year: int) -> List[schemas.PlanResponse]:
     plans_for_year = []
 
-    # 1월부터 12월까지 각 월의 데이터를 계산
     for month in range(1, 13):
         start_date, end_date = get_date_range(year, month)
 
-        # 월별 계획된 생산량과 사업 계획
         prod_plan = db.query(func.sum(Plan.inventory)).filter(Plan.year == year, Plan.month == month).scalar() or 0
         business_plan = db.query(func.sum(Plan.inventory * Plan.price)).filter(Plan.year == year, Plan.month == month).scalar() or 0
 
-        # 월별 실제 생산량 및 사업 실적
         prod_amount = db.query(func.sum(Production.produced_quantity)).filter(Production.date.between(start_date.date(), end_date.date())).scalar() or 0
         business_amount = db.query(func.sum(Production.produced_quantity * Plan.price))\
             .select_from(Production)\
@@ -54,11 +50,9 @@ def get_all_plans_for_year(db: Session, year: int) -> List[schemas.PlanResponse]
             .filter(Production.date.between(start_date.date(), end_date.date()))\
             .scalar() or 0
 
-        # 생산 달성률 및 사업 달성률 계산
         production_achievement_rate = round((prod_amount / prod_plan) * 100 if prod_plan > 0 else 0, 2)
         business_achievement_rate = round((business_amount / business_plan) * 100 if business_plan > 0 else 0, 2)
 
-        # 해당 월의 데이터 저장
         monthly_plan = schemas.PlanResponse(
             year=year,
             month=month,
@@ -74,7 +68,6 @@ def get_all_plans_for_year(db: Session, year: int) -> List[schemas.PlanResponse]
 
     return plans_for_year
 
-#plan update
 def update_plan(db: Session, plan_id: int, plan_update: schemas.PlanUpdate):
     plan = db.query(Plan).filter(Plan.id == plan_id).first()
     
@@ -98,7 +91,7 @@ def delete_plan(db: Session, plan_id: int):
     db.commit()
     return plan
 
-# Production CRUD
+#production CRUD
 def create_production(db: Session, production: schemas.ProductionBase):
     db_production = Production(
         date=production.date,
@@ -127,18 +120,18 @@ def get_production(db: Session, production_id: int):
     production_get = db.query(Production).filter(Production.id == production_id).first()
     return  production_get
 
-#productions전체
+#production전체
 def get_all_productions(db: Session):
     production_get = db.query(Production).all()
     return [production.__dict__ for production in production_get]
 
-#가장 최근 production반환
+#특정날짜 production반환
 def get_day_production(db: Session, year: int, month: int, day: int):
     get_date = datetime(year, month, day).date()
     production_get = db.query(Production).filter(Production.date == get_date).order_by(desc(Production.id)).limit(20).all()
     return [production.__dict__ for production in production_get]
 
-# InventoryManagement CRUD
+#inventory_management CRUD
 def create_inventory_management(db: Session, inventory: schemas.InventoryManagementBase):
     db_inventory = InventoryManagement(
         date=inventory.date,
@@ -169,11 +162,12 @@ def get_inventory(db: Session, inventory_id: int):
     inventory_get = db.query(InventoryManagement).filter(InventoryManagement.id == inventory_id).first()
     return  inventory_get
     
-#inventories전체
+#inventory전체
 def get_all_inventories(db: Session):
     inventory_get = db.query(InventoryManagement).all()
     return [inventory.__dict__ for inventory in inventory_get]
 
+#material CRUD
 def create_materials(db: Session, material: schemas.MaterialBase):
     db_material = Material(
         date=material.date,
@@ -191,6 +185,7 @@ def create_materials(db: Session, material: schemas.MaterialBase):
     db.refresh(db_material)
     return db_material.__dict__
 
+#material 전체
 def get_materials(db: Session):
     material_get = db.query(Material).all()
     return [material.__dict__ for material in material_get]
@@ -218,19 +213,18 @@ def delete_material(db: Session, material_id: int):
     db.commit()
     return material
 
+#월별 material 상승률
 def get_material_for_month(db: Session, year: int, month: int):
 
     current_start_date = datetime(year, month, 1)
     next_month = month % 12 + 1
     current_end_date = datetime(year, next_month, 1) - timedelta(days=1)
 
-    # 전월의 첫 번째 날과 마지막 날을 계산
     previous_month = (month - 1) or 12
     previous_year = year - 1 if month == 1 else year
     previous_start_date = datetime(previous_year, previous_month, 1)
     previous_end_date = datetime(year, month, 1) - timedelta(days=1)
 
-    # 전월 실적 및 당월 실적 조회
     current_data = db.query(func.sum(Material.quantity*MaterialInven.price).label("current_amount"), Material.client)\
         .filter(Material.date >= current_start_date, Material.date <= current_end_date)\
         .group_by(Material.client).all()
@@ -239,7 +233,6 @@ def get_material_for_month(db: Session, year: int, month: int):
         .filter(Material.date >= previous_start_date, Material.date <= previous_end_date)\
         .group_by(Material.client).all()
 
-    # 데이터를 매핑
     previous_map = {data.client: data.previous_amount for data in previous_data}
 
     results = []
@@ -247,7 +240,6 @@ def get_material_for_month(db: Session, year: int, month: int):
         previous_amount = previous_map.get(current.client, 0)
         growth_rate = ((current.current_amount - previous_amount) / previous_amount * 100) if previous_amount else 0
 
-        # 결과를 MaterialResponse로 변환
         result = schemas.MaterialResponse(
             year=year,
             month=month,
@@ -260,6 +252,7 @@ def get_material_for_month(db: Session, year: int, month: int):
     
     return results
 
+#material_inven 전체
 def get_all_material_invens(db: Session):
     material_get = db.query(MaterialInven).all()
     return [material.__dict__ for material in material_get]
