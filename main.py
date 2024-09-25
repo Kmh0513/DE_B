@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 import crud, schemas
 from database import get_db
 from typing import List
+import datetime
 
 app = FastAPI()
 @app.get("/")
@@ -46,9 +47,16 @@ def create_production(production: schemas.ProductionCreate, db: Session = Depend
 def get_all_productions(db: Session = Depends(get_db)):
     return crud.get_all_productions(db)
 
-@app.get("/productions/day/{year},{month},{day}", response_model=List[schemas.ProductionBase])
-def get_day_production_data(year: int, month: int, day: int, db: Session = Depends(get_db)):
-    production = crud.get_day_production(db, year, month, day)
+@app.get("/productions/day/{date}", response_model=List[schemas.ProductionBase])
+def get_day_production_data(date: datetime.date,  db: Session = Depends(get_db)):
+    production = crud.get_day_production(db, date)
+    if production is None:
+        raise HTTPException(status_code=404, detail="Production not found")
+    return production
+
+@app.get("/productions/day/{start_date}/{end_date}", response_model=List[schemas.ProductionBase])
+def get_day_production_data(start_date: datetime.date, end_date: datetime.date, operator: str, item_number: int, item_name: str, db: Session = Depends(get_db)):
+    production = crud.get_days_production(db, start_date, end_date, operator, item_number, item_name)
     if production is None:
         raise HTTPException(status_code=404, detail="Production not found")
     return production
