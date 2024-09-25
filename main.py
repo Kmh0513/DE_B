@@ -7,6 +7,7 @@ from typing import List
 
 app = FastAPI()
 
+#plan 엔드포인트
 @app.post("/plans/", response_model=schemas.PlanCreate)
 def create_plan(plan: schemas.PlanCreate, db: Session = Depends(get_db)):
     return crud.create_plan(db, plan)
@@ -33,7 +34,7 @@ def delete_plan_route(plan_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Plan not found")
     return {"detail": "Plan deleted"}
 
-# Production Endpoints
+#production 엔드포인트
 @app.post("/productions/", response_model=schemas.ProductionBase)
 def create_production(production: schemas.ProductionBase, db: Session = Depends(get_db)):
     return crud.create_production(db, production)
@@ -56,8 +57,7 @@ def get_day_production_data(year: int, month: int, day: int, db: Session = Depen
         raise HTTPException(status_code=404, detail="Production not found")
     return production
 
-
-# Inventory Management Endpoints
+#inventory 엔드포인트
 @app.post("/inventories/{year}", response_model=schemas.InventoryManagementBase)
 def create_inventory_management(inventory: schemas.InventoryManagementBase, db: Session = Depends(get_db)):
     return crud.create_inventory_management(db=db, inventory=inventory)
@@ -73,6 +73,7 @@ def get_inventory(inventory_id: int, db: Session = Depends(get_db)):
 def get_all_inventories(db: Session = Depends(get_db)):
     return crud.get_all_inventories(db=db)
 
+#material 엔드포인트
 @app.post("/materials/", response_model=schemas.MaterialBase)
 def create_material(material: schemas.MaterialBase, db: Session = Depends(get_db)):
     return crud.create_materials(db=db, material=material)

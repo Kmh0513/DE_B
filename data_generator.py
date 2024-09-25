@@ -8,6 +8,7 @@ from models import Production, InventoryManagement,  MaterialInven
 from schemas import ProductionBase, InventoryManagementBase, MaterialInvenBase
 from database import SessionLocal
 
+#production generate
 def generate_random_production_data():
     target_quantity = random.randint(200, 500)
     produced_quantity = random.randint(1, target_quantity) 
@@ -17,7 +18,7 @@ def generate_random_production_data():
     total_time = operating_time + non_operating_time
     equipment_efficiency = (operating_time.total_seconds() / total_time.total_seconds()) * 100 if total_time.total_seconds() > 0 else 0
     item_number_name = random.randint(1, 10)
-    # 생산 데이터 생성
+    
     return ProductionBase(
         date=datetime.now().date(),
         line=f"Line{random.randint(1, 5)}",
@@ -29,8 +30,8 @@ def generate_random_production_data():
         produced_quantity=produced_quantity,
         production_efficiency=int(production_efficiency),
         equipment=f"Equipment{random.randint(1, 10)}",
-        operating_time=(datetime.min + operating_time).time(),  # time 객체로 변환
-        non_operating_time=(datetime.min + non_operating_time).time(),  # time 객체로 변환
+        operating_time=(datetime.min + operating_time).time(),  
+        non_operating_time=(datetime.min + non_operating_time).time(),  
         shift=f"Shift{random.randint(1, 3)}",
         equipment_efficiency=int(equipment_efficiency),
         specification=f"Specification{random.randint(1, 5)}"
@@ -58,6 +59,7 @@ def insert_production_data(db: Session, production_data: ProductionBase):
     db.add(db_production)
     db.commit()
 
+#inventory generate
 def generate_random_inventory_data():
     item_number = random.randint(1, 10)
     item_name = f"Item{item_number}"
@@ -121,6 +123,7 @@ def insert_inventory_data(db: Session, Invetory_data: InventoryManagementBase):
     db.add(db_inventory)
     db.commit()
 
+#material generate
 def generate_random_material_data():
     item_number = random.randint(1, 10)
     item_name = f"Item{item_number}"
