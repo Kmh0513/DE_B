@@ -1,11 +1,9 @@
 import random
 import time as t
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from models import Production, InventoryManagement,  MaterialInven
-from schemas import ProductionBase, InventoryManagementBase, MaterialInvenBase
+from schemas import ProductionCreate, InventoryManagementCreate, MaterialInvenCreate
 from database import SessionLocal
 
 #production generate
@@ -19,7 +17,7 @@ def generate_random_production_data():
     equipment_efficiency = (operating_time.total_seconds() / total_time.total_seconds()) * 100 if total_time.total_seconds() > 0 else 0
     item_number_name = random.randint(1, 10)
     
-    return ProductionBase(
+    return ProductionCreate(
         date=datetime.now().date(),
         line=f"Line{random.randint(1, 5)}",
         operator=f"Operator{random.randint(1, 10)}",
@@ -37,7 +35,7 @@ def generate_random_production_data():
         specification=f"Specification{random.randint(1, 5)}"
     )
 
-def insert_production_data(db: Session, production_data: ProductionBase):
+def insert_production_data(db: Session, production_data: ProductionCreate):
     db_production = Production(
         date=production_data.date,
         line=production_data.line,
@@ -78,7 +76,7 @@ def generate_random_inventory_data():
     adjustment_quantity = random.randint(-50, 50)
     difference_quantity = current_quantity - lot_current_quantity
 
-    return InventoryManagementBase(
+    return InventoryManagementCreate(
         date=datetime.now().date(),
         item_number=item_number,
         item_name=item_name,
@@ -98,7 +96,7 @@ def generate_random_inventory_data():
         difference_quantity=difference_quantity
     )
 
-def insert_inventory_data(db: Session, Invetory_data: InventoryManagementBase):
+def insert_inventory_data(db: Session, Invetory_data: InventoryManagementCreate):
     
     db_inventory = InventoryManagement(
         date=Invetory_data.date,
@@ -135,7 +133,7 @@ def generate_random_material_data():
     overall_status_quantity = random.randint(1, 100)
     overall_status_amount = overall_status_quantity*price
 
-    return MaterialInvenBase(
+    return MaterialInvenCreate(
         date=datetime.now().date(),
         item_number=item_number,
         item_name=item_name,
@@ -148,7 +146,7 @@ def generate_random_material_data():
         overall_status_amount=overall_status_amount
     )
 
-def insert_material_data(db: Session, Material_data: MaterialInvenBase):
+def insert_material_data(db: Session, Material_data: MaterialInvenCreate):
     
     db_material = MaterialInven(
         date=datetime.now().date(),
@@ -176,7 +174,7 @@ def main():
             insert_inventory_data(db, invetory_data)
             insert_material_data(db, material_inven_data)
             print(f"Inserted: {production_data}, {invetory_data}, {material_inven_data}")
-            t.sleep(10)  # 10초 대기
+            t.sleep(10) 
     finally:
         db.close()
 

@@ -12,7 +12,7 @@ def get_date_range(year: int, month: int, day: int):
     return start_date, end_date
 
 #plan CRUD
-def create_plan(db: Session, plan: schemas.PlanBase):
+def create_plan(db: Session, plan: schemas.PlanCreate):
     db_plan = Plan(
         year=plan.year,
         month=plan.month,
@@ -29,12 +29,12 @@ def create_plan(db: Session, plan: schemas.PlanBase):
     return db_plan.__dict__
 
 #plan전체
-def get_plans(db: Session):
+def get_all_plans(db: Session):
     plan_get=db.query(Plan).all()
     return [plan.__dict__ for plan in plan_get]
 
 #연도별 plan rate 데이터
-def get_all_plans_for_year(db: Session, year: int) -> List[schemas.PlanResponse]:
+def get_plans_rate_for_year(db: Session, year: int) -> List[schemas.PlanResponse]:
     plans_for_year = []
 
     for month in range(1, 13):
@@ -92,7 +92,7 @@ def delete_plan(db: Session, plan_id: int):
     return plan
 
 #production CRUD
-def create_production(db: Session, production: schemas.ProductionBase):
+def create_production(db: Session, production: schemas.ProductionCreate):
     db_production = Production(
         date=production.date,
         line=production.line,
@@ -132,7 +132,7 @@ def get_day_production(db: Session, year: int, month: int, day: int):
     return [production.__dict__ for production in production_get]
 
 #inventory_management CRUD
-def create_inventory_management(db: Session, inventory: schemas.InventoryManagementBase):
+def create_inventory_management(db: Session, inventory: schemas.InventoryManagementCreate):
     db_inventory = InventoryManagement(
         date=inventory.date,
         item_number=inventory.item_number,
@@ -168,7 +168,7 @@ def get_all_inventories(db: Session):
     return [inventory.__dict__ for inventory in inventory_get]
 
 #material CRUD
-def create_materials(db: Session, material: schemas.MaterialBase):
+def create_materials(db: Session, material: schemas.MaterialCreate):
     db_material = Material(
         date=material.date,
         client=material.client,
@@ -186,7 +186,7 @@ def create_materials(db: Session, material: schemas.MaterialBase):
     return db_material.__dict__
 
 #material 전체
-def get_materials(db: Session):
+def get_all_materials(db: Session):
     material_get = db.query(Material).all()
     return [material.__dict__ for material in material_get]
 
@@ -214,7 +214,7 @@ def delete_material(db: Session, material_id: int):
     return material
 
 #월별 material 상승률
-def get_material_for_month(db: Session, year: int, month: int):
+def get_material_rate_for_month(db: Session, year: int, month: int):
 
     current_start_date = datetime(year, month, 1)
     next_month = month % 12 + 1
@@ -226,10 +226,14 @@ def get_material_for_month(db: Session, year: int, month: int):
     previous_end_date = datetime(year, month, 1) - timedelta(days=1)
 
     current_data = db.query(func.sum(Material.quantity*MaterialInven.price).label("current_amount"), Material.client)\
+        .select_from(MaterialInven)\
+        .join(Material, Material.item_name == MaterialInven.item_name)\
         .filter(Material.date >= current_start_date, Material.date <= current_end_date)\
         .group_by(Material.client).all()
 
     previous_data = db.query(func.sum(Material.quantity*MaterialInven.price).label("previous_amount"), Material.client)\
+        .select_from(MaterialInven)\
+        .join(Material, Material.item_name == MaterialInven.item_name)\
         .filter(Material.date >= previous_start_date, Material.date <= previous_end_date)\
         .group_by(Material.client).all()
 
