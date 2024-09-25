@@ -9,11 +9,11 @@ app = FastAPI()
 
 @app.post("/plans/", response_model=schemas.PlanCreate)
 def create_plan(plan: schemas.PlanCreate, db: Session = Depends(get_db)):
-    return crud.create_plan(db=db, plan=plan).__dict__
+    return crud.create_plan(db, plan)
 
 @app.get("/plans/all", response_model=List[schemas.PlanBase])
 def get_plans(db: Session = Depends(get_db)):
-    return crud.get_plans(db=db)
+    return crud.get_plans(db)
 
 @app.get("/plans_rate/{year}", response_model=List[schemas.PlanResponse])
 def read_plans(year: int, db: Session = Depends(get_db)):
@@ -26,7 +26,7 @@ def update_plan_route(plan_id: int, plan_update: schemas.PlanUpdate, db: Session
         raise HTTPException(status_code=404, detail="Plan not found")
     return updated_plan
 
-@app.delete("/plans/{plan_id}", response_model=schemas.PlanUpdate)
+@app.delete("/plans/{plan_id}")
 def delete_plan_route(plan_id: int, db: Session = Depends(get_db)):
     deleted_plan = crud.delete_plan(db, plan_id)
     if not deleted_plan:
@@ -36,25 +36,29 @@ def delete_plan_route(plan_id: int, db: Session = Depends(get_db)):
 # Production Endpoints
 @app.post("/productions/", response_model=schemas.ProductionBase)
 def create_production(production: schemas.ProductionBase, db: Session = Depends(get_db)):
-    return crud.create_production(db=db, production=production)
+    return crud.create_production(db, production)
 
 @app.get("/productions/{production_id}", response_model=schemas.ProductionBase)
 def get_production(production_id: int, db: Session = Depends(get_db)):
-    production = crud.get_production(db=db, production_id=production_id)
+    production = crud.get_production(db, production_id)
     if production is None:
         raise HTTPException(status_code=404, detail="Production not found")
     return production.__dict__
 
 @app.get("/productions/", response_model=List[schemas.ProductionBase])
 def get_all_productions(db: Session = Depends(get_db)):
-    return crud.get_all_productions(db=db)
+    return crud.get_all_productions(db)
 
-@app.get("/production/latest", response_model=schemas.ProductionBase)
-def get_latest_production_data(db: Session = Depends(get_db)):
-    return crud.get_latest_production(db)
+@app.get("/production/{year},{month},{day}", response_model=List[schemas.ProductionBase])
+def get_day_production_data(year: int, month: int, day: int, db: Session = Depends(get_db)):
+    production = crud.get_day_production(db, year, month, day)
+    if production is None:
+        raise HTTPException(status_code=404, detail="Production not found")
+    return production
+
 
 # Inventory Management Endpoints
-@app.post("/inventories/", response_model=schemas.InventoryManagementBase)
+@app.post("/inventories/{year}", response_model=schemas.InventoryManagementBase)
 def create_inventory_management(inventory: schemas.InventoryManagementBase, db: Session = Depends(get_db)):
     return crud.create_inventory_management(db=db, inventory=inventory)
 
@@ -79,12 +83,12 @@ def get_materials(db: Session = Depends(get_db)):
 
 @app.put("/materials/{material_id}", response_model=schemas.MaterialUpdate)
 def update_material_route(material_id: int, material_update: schemas.MaterialUpdate, db: Session = Depends(get_db)):
-    updated_plan = crud.update_materials(db, material_id, material_update)
+    updated_plan = crud.update_material(db, material_id, material_update)
     if not updated_plan:
         raise HTTPException(status_code=404, detail="Plan not found")
     return updated_plan
 
-@app.delete("/materials/{material_id}", response_model=schemas.MaterialUpdate)
+@app.delete("/materials/{material_id}")
 def delete_material_route(material_id: int, db: Session = Depends(get_db)):
     deleted_material = crud.delete_material(db, material_id)
     if not deleted_material:

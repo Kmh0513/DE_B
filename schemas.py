@@ -36,6 +36,7 @@ class PlanUpdate(BaseModel):
         orm_mode = True
 
 class ProductionBase(BaseModel):
+    id: int
     date: date
     line: Optional[str] = None
     operator: Optional[str] = None
@@ -54,6 +55,7 @@ class ProductionBase(BaseModel):
     account_idx: int = 1
 
 class InventoryManagementBase(BaseModel):
+    id: int
     date: date
     item_number: int
     item_name: str
@@ -74,6 +76,7 @@ class InventoryManagementBase(BaseModel):
     account_idx: int = 1
 
 class MaterialBase(BaseModel):
+    id: int
     date: date
     client: str
     item_number: int
