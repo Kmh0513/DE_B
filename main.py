@@ -39,13 +39,6 @@ def delete_plan_route(plan_id: int, db: Session = Depends(get_db)):
 def create_production(production: schemas.ProductionCreate, db: Session = Depends(get_db)):
     return crud.create_production(db, production)
 
-@app.get("/productions/{production_id}", response_model=schemas.ProductionBase)
-def get_production(production_id: int, db: Session = Depends(get_db)):
-    production = crud.get_production(db, production_id)
-    if production is None:
-        raise HTTPException(status_code=404, detail="Production not found")
-    return production.__dict__
-
 @app.get("/productions/all", response_model=List[schemas.ProductionBase])
 def get_all_productions(db: Session = Depends(get_db)):
     return crud.get_all_productions(db)
@@ -57,10 +50,21 @@ def get_day_production_data(year: int, month: int, day: int, db: Session = Depen
         raise HTTPException(status_code=404, detail="Production not found")
     return production
 
+@app.get("/productions/{production_id}", response_model=schemas.ProductionBase)
+def get_production(production_id: int, db: Session = Depends(get_db)):
+    production = crud.get_production(db, production_id)
+    if production is None:
+        raise HTTPException(status_code=404, detail="Production not found")
+    return production.__dict__
+
 #inventory 엔드포인트
 @app.post("/inventories/", response_model=schemas.InventoryManagementCreate)
 def create_inventory_management(inventory: schemas.InventoryManagementCreate, db: Session = Depends(get_db)):
     return crud.create_inventory_management(db=db, inventory=inventory)
+
+@app.get("/inventories/all", response_model=List[schemas.InventoryManagementBase])
+def get_all_inventories(db: Session = Depends(get_db)):
+    return crud.get_all_inventories(db=db)
 
 @app.get("/inventories/{inventory_id}", response_model=schemas.InventoryManagementBase)
 def get_inventory(inventory_id: int, db: Session = Depends(get_db)):
@@ -68,10 +72,6 @@ def get_inventory(inventory_id: int, db: Session = Depends(get_db)):
     if inventory is None:
         raise HTTPException(status_code=404, detail="Inventory not found")
     return inventory.__dict__
-
-@app.get("/inventories/all", response_model=List[schemas.InventoryManagementBase])
-def get_all_inventories(db: Session = Depends(get_db)):
-    return crud.get_all_inventories(db=db)
 
 #material 엔드포인트
 @app.post("/materials/", response_model=schemas.MaterialCreate)
@@ -82,11 +82,16 @@ def create_material(material: schemas.MaterialCreate, db: Session = Depends(get_
 def get_all_materials(db: Session = Depends(get_db)):
     return crud.get_all_materials(db=db)
 
+@app.get("/materials/rate{year},{month}", response_model=List[schemas.MaterialResponse])
+def get_material_rate(year: int, month: int, db: Session = Depends(get_db)):
+    materials = crud.get_material_rate_for_month(db, year, month)
+    return materials
+
 @app.put("/materials/{material_id}", response_model=schemas.MaterialUpdate)
 def update_material_route(material_id: int, material_update: schemas.MaterialUpdate, db: Session = Depends(get_db)):
     updated_plan = crud.update_material(db, material_id, material_update)
     if not updated_plan:
-        raise HTTPException(status_code=404, detail="Plan not found")
+        raise HTTPException(status_code=404, detail="Material not found")
     return updated_plan
 
 @app.delete("/materials/{material_id}")
@@ -95,11 +100,6 @@ def delete_material_route(material_id: int, db: Session = Depends(get_db)):
     if not deleted_material:
         raise HTTPException(status_code=404, detail="Material not found")
     return {"detail": "Material deleted"}
-
-@app.get("/materials/rate{year},{month}", response_model=List[schemas.MaterialResponse])
-def get_material_rate(year: int, month: int, db: Session = Depends(get_db)):
-    materials = crud.get_material_rate_for_month(db, year, month)
-    return materials
 
 @app.get("/material_invens/all", response_model=List[schemas.MaterialInvenCreate])
 def get_all_materialsinven(db: Session = Depends(get_db)):
