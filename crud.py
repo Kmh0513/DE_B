@@ -5,9 +5,13 @@ from sqlalchemy import func, desc
 from typing import List
 from datetime import datetime, timedelta
 # 기간 계산 함수
-def get_date_range(year: int, month: int):
-    start_date = datetime(year, month, 1)
-    end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
+def get_date_range(year: int, month: int, day: int):
+    if day:
+        start_date = datetime(year, month, day)
+        end_date = start_date 
+    else:
+        start_date = datetime(year, month, 1)
+        end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
     return start_date, end_date
 # Plan CRUD
 def create_plan(db: Session, plan: schemas.PlanBase):
@@ -24,7 +28,7 @@ def create_plan(db: Session, plan: schemas.PlanBase):
     db.add(db_plan)
     db.commit()
     db.refresh(db_plan)
-    return db_plan
+    return db_plan.__dict__
 # plans전체
 def get_plans(db: Session):
     plan_get=db.query(Plan).all()
@@ -117,7 +121,7 @@ def create_production(db: Session, production: schemas.ProductionBase):
     db.add(db_production)
     db.commit()
     db.refresh(db_production)
-    return db_production
+    return db_production.__dict__
 
 def get_production(db: Session, production_id: int):
     production_get = db.query(Production).filter(Production.id == production_id).first()
@@ -127,10 +131,13 @@ def get_production(db: Session, production_id: int):
 def get_all_productions(db: Session):
     production_get = db.query(Production).all()
     return [production.__dict__ for production in production_get]
+
 #가장 최근 production반환
-def get_latest_production(db: Session):
-    production_get = db.query(Production).order_by(desc(Production.date)).first()
-    return production_get.__dict__
+def get_day_production(db: Session, year: int, month: int, day: int):
+    get_date = datetime(year, month, day).date()
+    production_get = db.query(Production).filter(Production.date == get_date).order_by(desc(Production.id)).limit(20).all()
+    return [production.__dict__ for production in production_get]
+
 # InventoryManagement CRUD
 def create_inventory_management(db: Session, inventory: schemas.InventoryManagementBase):
     db_inventory = InventoryManagement(
@@ -156,7 +163,7 @@ def create_inventory_management(db: Session, inventory: schemas.InventoryManagem
     db.add(db_inventory)
     db.commit()
     db.refresh(db_inventory)
-    return db_inventory
+    return db_inventory.__dict__
 
 def get_inventory(db: Session, inventory_id: int):
     inventory_get = db.query(InventoryManagement).filter(InventoryManagement.id == inventory_id).first()
@@ -182,7 +189,7 @@ def create_materials(db: Session, material: schemas.MaterialBase):
     db.add(db_material)
     db.commit()
     db.refresh(db_material)
-    return db_material
+    return db_material.__dict__
 
 def get_materials(db: Session):
     material_get = db.query(Material).all()
