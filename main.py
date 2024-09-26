@@ -54,7 +54,7 @@ def get_day_production_data(date: datetime.date,  db: Session = Depends(get_db))
         raise HTTPException(status_code=404, detail="Production not found")
     return production
 
-@app.get("/productions/day/{start_date}/{end_date}", response_model=List[schemas.ProductionBase])
+@app.get("/productions/days/", response_model=List[schemas.ProductionBase])
 def get_days_production_data(start_date: datetime.date, end_date: datetime.date, operator: str=None, item_number: int=None, item_name: str=None, db: Session = Depends(get_db)):
     production = crud.get_days_production(db, start_date, end_date, operator, item_number, item_name)
     if production is None:
