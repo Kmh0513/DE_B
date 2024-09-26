@@ -15,14 +15,14 @@ def generate_random_production_data():
     non_operating_time = timedelta(hours=random.randint(0, 23), minutes=random.randint(0, 59))
     total_time = operating_time + non_operating_time
     equipment_efficiency = (operating_time.total_seconds() / total_time.total_seconds()) * 100 if total_time.total_seconds() > 0 else 0
-    item_number_name = random.randint(1, 10)
+    number = random.randint(1, 10)
     
     return ProductionCreate(
         date=datetime.now().date(),
         line=f"Line{random.randint(1, 5)}",
         operator=f"Operator{random.randint(1, 10)}",
-        item_number=item_number_name,
-        item_name=f"Item{item_number_name}",
+        item_number = f"Item_Number{number}",
+        item_name = f"Item{number}",
         model=f"Model{random.randint(1, 5)}",
         target_quantity=target_quantity,
         produced_quantity=produced_quantity,
@@ -59,8 +59,9 @@ def insert_production_data(db: Session, production_data: ProductionCreate):
 
 #inventory generate
 def generate_random_inventory_data():
-    item_number = random.randint(1, 10)
-    item_name = f"Item{item_number}"
+    number = random.randint(1, 10)
+    item_number = f"Item_Number{number}"
+    item_name = f"Item{number}"
     price = round(random.uniform(10.0, 100.0), 2)
     basic_quantity = random.randint(1, 100)
     in_quantity = random.randint(0, 100)
@@ -123,8 +124,9 @@ def insert_inventory_data(db: Session, Invetory_data: InventoryManagementCreate)
 
 #material generate
 def generate_random_material_data():
-    item_number = random.randint(1, 10)
-    item_name = f"Item{item_number}"
+    number = random.randint(1, 10)
+    item_number = f"Item_Number{number}"
+    item_name = f"Item{number}"
     item_category = f"Category{random.randint(1, 3)}"
     price = round(random.uniform(10.0, 100.0), 2)
     process = f"Process{random.randint(1, 5)}"
