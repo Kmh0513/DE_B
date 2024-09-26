@@ -155,6 +155,7 @@ class MaterialResponse(BaseModel):
     growth_rate: Optional[float] = None
 
 class MaterialUpdate(BaseModel):
+    date: Optional[date]
     client: Optional[str] = None
     item_number: Optional[str] = None
     item_name: Optional[str] = None
