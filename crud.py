@@ -125,7 +125,7 @@ def get_all_productions(db: Session):
     production_get = db.query(Production).all()
     return [production.__dict__ for production in production_get]
 
-def get_days_production(db: Session, start_date: datetime.date, end_date: datetime.date, operator: str , item_number: int , item_name: str):
+def get_days_production(db: Session, start_date: datetime.date, end_date: datetime.date, operator: str , item_number: str , item_name: str):
     querys = db.query(Production).filter(Production.date.between(start_date, end_date))
     if operator:
         querys = querys.filter(Production.operator == operator)

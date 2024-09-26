@@ -5,7 +5,7 @@ from datetime import date, time
 class PlanCreate(BaseModel):
     year: int
     month: int
-    item_number: int
+    item_number: str
     item_name: str
     inventory: int
     model: str
@@ -16,7 +16,7 @@ class PlanBase(BaseModel):
     id: int
     year: int
     month: int
-    item_number: int
+    item_number: str
     item_name: str
     inventory: int
     model: str
@@ -36,7 +36,7 @@ class PlanResponse(BaseModel):
 class PlanUpdate(BaseModel):
     year: Optional[int] = None
     month: Optional[int] = None
-    item_number: Optional[int] = None
+    item_number: Optional[str] = None
     item_name: Optional[str] = None
     inventory: Optional[int] = None
     model: Optional[str] = None
@@ -49,7 +49,7 @@ class ProductionCreate(BaseModel):
     date: date
     line: Optional[str] = None
     operator: Optional[str] = None
-    item_number: int
+    item_number: str
     item_name: str
     model: str
     target_quantity: int
@@ -68,7 +68,7 @@ class ProductionBase(BaseModel):
     date: date
     line: Optional[str] = None
     operator: Optional[str] = None
-    item_number: int
+    item_number: str
     item_name: str
     model: str
     target_quantity: int
@@ -84,7 +84,7 @@ class ProductionBase(BaseModel):
 
 class InventoryManagementCreate(BaseModel):
     date: date
-    item_number: int
+    item_number: str
     item_name: str
     price: float
     basic_quantity: int
@@ -105,7 +105,7 @@ class InventoryManagementCreate(BaseModel):
 class InventoryManagementBase(BaseModel):
     id: int
     date: date
-    item_number: int
+    item_number: str
     item_name: str
     price: float
     basic_quantity: int
@@ -126,7 +126,7 @@ class InventoryManagementBase(BaseModel):
 class MaterialCreate(BaseModel):
     date: date
     client: str
-    item_number: int
+    item_number: str
     item_name: str
     item_category: str
     model: str
@@ -138,7 +138,7 @@ class MaterialBase(BaseModel):
     id: int
     date: date
     client: str
-    item_number: int
+    item_number: str
     item_name: str
     item_category: str
     model: str
@@ -156,7 +156,7 @@ class MaterialResponse(BaseModel):
 
 class MaterialUpdate(BaseModel):
     client: Optional[str] = None
-    item_number: Optional[int] = None
+    item_number: Optional[str] = None
     item_name: Optional[str] = None
     item_category: Optional[str] = None
     model: Optional[str] = None
@@ -168,7 +168,7 @@ class MaterialUpdate(BaseModel):
 
 class MaterialInvenCreate(BaseModel):
     date: date
-    item_number: int
+    item_number: str
     item_name: str
     price: float
     item_category: str
@@ -182,7 +182,7 @@ class MaterialInvenCreate(BaseModel):
 class MaterialInvenBase(BaseModel):
     id:int
     date: date
-    item_number: int
+    item_number: str
     item_name: str
     price: float
     item_category: str
