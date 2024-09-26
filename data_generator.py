@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from models import Production, InventoryManagement,  MaterialInven
 from schemas import ProductionCreate, InventoryManagementCreate, MaterialInvenCreate
 from database import SessionLocal
+from get_companies_list import company_names
 
 #production generate
 def generate_random_production_data():
@@ -16,14 +17,14 @@ def generate_random_production_data():
     total_time = operating_time + non_operating_time
     equipment_efficiency = (operating_time.total_seconds() / total_time.total_seconds()) * 100 if total_time.total_seconds() > 0 else 0
     number = random.randint(1, 10)
-    
+    model = random.choice(['가전', '건조기', '세탁기', '식기세척기', '에어컨', '중장비', '포장박스', 'LX2PE', 'GEN3.5', 'MX5'])
     return ProductionCreate(
         date=datetime.now().date(),
         line=f"Line{random.randint(1, 5)}",
         operator=f"Operator{random.randint(1, 10)}",
         item_number = f"Item_Number{number}",
         item_name = f"Item{number}",
-        model=f"Model{random.randint(1, 5)}",
+        model=model,
         target_quantity=target_quantity,
         produced_quantity=produced_quantity,
         production_efficiency=int(production_efficiency),
@@ -127,11 +128,11 @@ def generate_random_material_data():
     number = random.randint(1, 10)
     item_number = f"Item_Number{number}"
     item_name = f"Item{number}"
-    item_category = f"Category{random.randint(1, 3)}"
+    item_category = random.choice(['원재료', '부재료', '재공품', '제품', '반제품'])
     price = round(random.uniform(10.0, 100.0), 2)
     process = f"Process{random.randint(1, 5)}"
-    client = f"Client{random.randint(1, 5)}"
-    model = f"Model{random.randint(1, 5)}"
+    client = random.choice(company_names)
+    model = random.choice(['가전', '건조기', '세탁기', '식기세척기', '에어컨', '중장비', '포장박스', 'LX2PE', 'GEN3.5', 'MX5'])
     overall_status_quantity = random.randint(1, 100)
     overall_status_amount = overall_status_quantity*price
 
