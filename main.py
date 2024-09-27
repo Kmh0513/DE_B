@@ -132,7 +132,7 @@ def delete_material_route(material_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Material not found")
     return {"detail": "Material deleted"}
 
-@app.get("/material_invens/all/", response_model=List[schemas.MaterialInvenCreate])
+@app.get("/material_invens/all/", response_model=List[schemas.MaterialInvenBase])
 def get_all_materialsinven(db: Session = Depends(get_db)):
     return crud.get_all_material_invens(db=db)
 
