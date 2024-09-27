@@ -66,7 +66,7 @@ class ProductionCreate(BaseModel):
     target_quantity: int
     produced_quantity: int
     production_efficiency: int
-    proscess: str
+    process: str
     operating_time: time
     non_operating_time: time
     shift: str

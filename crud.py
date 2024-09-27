@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from models import Plan, Production, InventoryManagement, Material, MaterialInven, MaterialInOutManagement
 import schemas
-from sqlalchemy import func, desc
+from sqlalchemy import extract, func, desc
 from typing import List
 from datetime import datetime, timedelta
 
@@ -140,7 +140,7 @@ def create_production(db: Session, production: schemas.ProductionCreate):
         target_quantity=production.target_quantity,
         produced_quantity=production.produced_quantity,
         production_efficiency=production.production_efficiency,
-        process=production.proscess,
+        process=production.process,
         operating_time=production.operating_time,
         non_operating_time=production.non_operating_time,
         shift=production.shift,
@@ -156,6 +156,10 @@ def create_production(db: Session, production: schemas.ProductionCreate):
 def get_production(db: Session, production_id: int):
     production_get = db.query(Production).filter(Production.id == production_id).first()
     return  production_get
+
+def get_production_year(db: Session, year: int):
+    production_get = db.query(Production).filter(extract('year', Production.date) == year).all()
+    return  [production.__dict__ for production in production_get]
 
 #production전체
 def get_all_productions(db: Session):

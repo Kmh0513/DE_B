@@ -52,6 +52,13 @@ def create_production(production: schemas.ProductionCreate, db: Session = Depend
 def get_all_productions(db: Session = Depends(get_db)):
     return crud.get_all_productions(db)
 
+@app.get("/productions/{year}", response_model=List[schemas.ProductionBase])
+def get_production(year: int, db: Session = Depends(get_db)):
+    production = crud.get_production_year(db, year)
+    if production is None:
+        raise HTTPException(status_code=404, detail="Production not found")
+    return production
+
 @app.get("/productions/day/{date}", response_model=List[schemas.ProductionBase])
 def get_day_production_data(date: datetime.date,  db: Session = Depends(get_db)):
     production = crud.get_day_production(db, date)
@@ -66,7 +73,7 @@ def get_days_production_data(start_date: datetime.date, end_date: datetime.date,
         raise HTTPException(status_code=404, detail="Production not found")
     return production
 
-@app.get("/productions/{production_id}", response_model=schemas.ProductionBase)
+@app.get("/productions/id/{production_id}", response_model=schemas.ProductionBase)
 def get_production(production_id: int, db: Session = Depends(get_db)):
     production = crud.get_production(db, production_id)
     if production is None:
