@@ -66,11 +66,11 @@ class ProductionCreate(BaseModel):
     target_quantity: int
     produced_quantity: int
     production_efficiency: int
-    equipment: str
+    proscess: str
     operating_time: time
     non_operating_time: time
     shift: str
-    equipment_efficiency: int
+    line_efficiency: int
     specification: str
     account_idx: int = 1
 
@@ -85,11 +85,11 @@ class ProductionBase(BaseModel):
     target_quantity: int
     produced_quantity: int
     production_efficiency: int
-    equipment: str
+    process: str
     operating_time: time
     non_operating_time: time
     shift: str
-    equipment_efficiency: int
+    line_efficiency: int
     specification: str
     account_idx: int = 1
 
@@ -211,3 +211,45 @@ class MaterialInvenBase(BaseModel):
     overall_status_quantity: int
     overall_status_amount: float
     account_idx: int = 1
+
+class MaterialInOutManagementCreate(BaseModel):
+    date: date
+    statement_number: str
+    client: str
+    delivery_quantity: int 
+    defective_quantity: int 
+    settienment_quantity: int 
+    supply_amount: float 
+    vat: float
+    total_amount: float 
+    purchase_category: str
+    account_idx: int = 1
+
+class MaterialInOutManagementBase(BaseModel):
+    id: int
+    date: date
+    statement_number: str
+    client: str
+    delivery_quantity: int 
+    defective_quantity: int 
+    settienment_quantity: int 
+    supply_amount: float 
+    vat: float
+    total_amount: float 
+    purchase_category: str
+    account_idx: int = 1
+
+class MaterialInOutManagementUpdate(BaseModel):
+    date: Optional[date]
+    statement_number: Optional[str] = None
+    client: Optional[str] = None
+    delivery_quantity: Optional[int] = None
+    defective_quantity: Optional[int] = None
+    settienment_quantity: Optional[int] = None
+    supply_amount: Optional[float] = None
+    vat: Optional[float] = None
+    total_amount: Optional[float] = None
+    purchase_category: Optional[str] = None
+
+    class Config:
+        orm_mode = True

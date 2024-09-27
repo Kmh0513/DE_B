@@ -29,11 +29,11 @@ class Production(Base):
     target_quantity = Column(Integer)
     produced_quantity = Column(Integer)
     production_efficiency = Column(Integer)
-    equipment = Column(String(100))
+    process = Column(String(100))
     operating_time = Column(Time)
     non_operating_time = Column(Time)
     shift = Column(String(100))
-    equipment_efficiency = Column(Integer)
+    line_efficiency = Column(Integer)
     specification = Column(String(100))
     account_idx = Column(Integer)
 
@@ -88,4 +88,20 @@ class MaterialInven(Base):
     model = Column(String(100))
     overall_status_quantity = Column(Integer)
     overall_status_amount = Column(Float)
-    account_idx: int = 1
+    account_idx = Column(Integer)
+
+class MaterialInOutManagement(Base):
+    __tablename__ = "material_in_out_managements"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    date = Column(Date)
+    statement_number = Column(String(100))
+    client = Column(String(100))
+    delivery_quantity = Column(Integer) 
+    defective_quantity = Column(Integer) 
+    settienment_quantity = Column(Integer) 
+    supply_amount = Column(Float) 
+    vat = Column(Float)
+    total_amount = Column(Float) 
+    purchase_category = Column(String(100))
+    account_idx = Column(Integer)

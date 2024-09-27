@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Plan, Production, InventoryManagement, Material, MaterialInven
+from models import Plan, Production, InventoryManagement, Material, MaterialInven, MaterialInOutManagement
 import schemas
 from sqlalchemy import func, desc
 from typing import List
@@ -140,11 +140,11 @@ def create_production(db: Session, production: schemas.ProductionCreate):
         target_quantity=production.target_quantity,
         produced_quantity=production.produced_quantity,
         production_efficiency=production.production_efficiency,
-        equipment=production.equipment,
+        process=production.proscess,
         operating_time=production.operating_time,
         non_operating_time=production.non_operating_time,
         shift=production.shift,
-        equipment_efficiency=production.equipment_efficiency,
+        line_efficiency=production.line_efficiency,
         specification=production.specification,
         account_idx=production.account_idx
     )
@@ -336,3 +336,51 @@ def get_material_rate_for_month(db: Session, year: int, month: int):
 def get_all_material_invens(db: Session):
     material_get = db.query(MaterialInven).all()
     return [material.__dict__ for material in material_get]
+
+#material_in_out_management
+def create_in_out(db: Session, material: schemas.MaterialInOutManagementCreate):
+    db_material = MaterialInOutManagement(
+        date=material.date,
+        statement_number=material.statement_number,
+        client=material.client,
+        delivery_quantity=material.delivery_quantity,
+        defective_quantity=material.defective_quantity,
+        settienment_quantity=material.settienment_quantity,
+        supply_amount=material.supply_amount,
+        vat=material.vat,
+        total_amount=material.total_amount,
+        purchase_category=material.purchase_category,
+        account_idx=material.account_idx
+    )
+    db.add(db_material)
+    db.commit()
+    db.refresh(db_material)
+    return db_material.__dict__
+
+#material_in_out 전체
+def get_all_materials_in_out(db: Session):
+    material_get = db.query(MaterialInOutManagement).all()
+    return [material.__dict__ for material in material_get]
+
+def update_material_in_out(db: Session, material_id: int, material_update: schemas.MaterialInOutManagementUpdate):
+    material = db.query(MaterialInOutManagement).filter(MaterialInOutManagement.id == material_id).first()
+    
+    if not material:
+        return None  
+    
+    for var, value in vars(material_update).items():
+        setattr(material, var, value)  
+        
+    db.commit()
+    db.refresh(material)  
+    return material
+
+def delete_material_in_out(db: Session, material_id: int):
+    material = db.query(MaterialInOutManagement).filter(MaterialInOutManagement.id == material_id).first()
+    
+    if not material:
+        return None
+    
+    db.delete(material)
+    db.commit()
+    return material

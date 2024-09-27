@@ -109,10 +109,10 @@ def get_material_rate(year: int, month: int, db: Session = Depends(get_db)):
 
 @app.put("/materials/{material_id}", response_model=schemas.MaterialUpdate)
 def update_material_route(material_id: int, material_update: schemas.MaterialUpdate, db: Session = Depends(get_db)):
-    updated_plan = crud.update_material(db, material_id, material_update)
-    if not updated_plan:
+    updated_material = crud.update_material(db, material_id, material_update)
+    if not updated_material:
         raise HTTPException(status_code=404, detail="Material not found")
-    return updated_plan
+    return updated_material
 
 @app.delete("/materials/{material_id}")
 def delete_material_route(material_id: int, db: Session = Depends(get_db)):
@@ -124,3 +124,26 @@ def delete_material_route(material_id: int, db: Session = Depends(get_db)):
 @app.get("/material_invens/all/", response_model=List[schemas.MaterialInvenCreate])
 def get_all_materialsinven(db: Session = Depends(get_db)):
     return crud.get_all_material_invens(db=db)
+
+#material_in_out 엔드포인트
+@app.post("/materials_in_out/", response_model=schemas.MaterialInOutManagementCreate)
+def create_in_out(material: schemas.MaterialInOutManagementCreate, db: Session = Depends(get_db)):
+    return crud.create_in_out(db=db, material=material)
+
+@app.get("/materials_in_out/all/", response_model=List[schemas.MaterialInOutManagementBase])
+def get_all_in_out(db: Session = Depends(get_db)):
+    return crud.get_all_materials_in_out(db=db)
+
+@app.put("/materials_in_out/{material_id}", response_model=schemas.MaterialInOutManagementUpdate)
+def update_in_out_route(material_id: int, material_update: schemas.MaterialInOutManagementUpdate, db: Session = Depends(get_db)):
+    updated_in_out = crud.update_material_in_out(db, material_id, material_update)
+    if not updated_in_out:
+        raise HTTPException(status_code=404, detail="Material not found")
+    return updated_in_out
+
+@app.delete("/materials_in_out/{material_id}")
+def delete_in_out_route(material_id: int, db: Session = Depends(get_db)):
+    deleted_in_out = crud.delete_material_in_out(db, material_id)
+    if not deleted_in_out:
+        raise HTTPException(status_code=404, detail="Material not found")
+    return {"detail": "Material deleted"}
