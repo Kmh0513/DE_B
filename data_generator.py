@@ -178,7 +178,8 @@ def insert_material_data(db: Session, Material_data: MaterialInvenCreate):
         client=Material_data.client,
         model=Material_data.model,
         overall_status_quantity=Material_data.overall_status_quantity,
-        overall_status_amount=Material_data.overall_status_amount
+        overall_status_amount=Material_data.overall_status_amount,
+        account_idx=Material_data.account_idx
     )
     db.add(db_material)
     db.commit()
