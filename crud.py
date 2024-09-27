@@ -20,6 +20,7 @@ def create_plan(db: Session, plan: schemas.PlanCreate):
         item_name=plan.item_name,
         inventory=plan.inventory,
         model=plan.model,
+        process=plan.process,
         price=plan.price,
         account_idx = plan.account_idx
     )
@@ -67,6 +68,42 @@ def get_plans_rate_for_year(db: Session, year: int) -> List[schemas.PlanResponse
         plans_for_year.append(monthly_plan)
 
     return plans_for_year
+
+#월별 plan 상승률
+def get_plan_rate_for_month(db: Session, year: int, month: int):
+
+    previous_month = (month - 1) or 12
+
+    current_data = db.query(func.sum(Plan.inventory*InventoryManagement.price).label("current_amount"), Plan.process)\
+        .select_from(InventoryManagement)\
+        .join(Plan, Plan.item_name == InventoryManagement.item_name)\
+        .filter(Plan.year == year, Plan.month == month)\
+        .group_by(Plan.process).all()
+
+    previous_data = db.query(func.sum(Plan.inventory*InventoryManagement.price).label("previous_amount"), Plan.process)\
+        .select_from(InventoryManagement)\
+        .join(Plan, Plan.item_name == InventoryManagement.item_name)\
+        .filter(Plan.year == year, Plan.month == previous_month)\
+        .group_by(Plan.process).all()
+
+    previous_map = {data.process: data.previous_amount for data in previous_data}
+
+    results = []
+    for current in current_data:
+        previous_amount = previous_map.get(current.process, 0)
+        growth_rate = ((current.current_amount - previous_amount) / previous_amount * 100) if previous_amount else 0
+
+        result = schemas.PlanResponse2(
+            year=year,
+            month=month,
+            process=current.process,
+            previous_amount=previous_amount,
+            current_amount=current.current_amount,
+            growth_rate=growth_rate
+        )
+        results.append(result)
+    
+    return results
 
 def update_plan(db: Session, plan_id: int, plan_update: schemas.PlanUpdate):
     plan = db.query(Plan).filter(Plan.id == plan_id).first()
@@ -223,6 +260,34 @@ def delete_material(db: Session, material_id: int):
     db.delete(material)
     db.commit()
     return material
+
+def get_material_rate_for_year(db: Session, year: int) -> List[schemas.MaterialResponse2]:
+    materials_for_year = []
+
+    for month in range(1, 13):
+        start_date, end_date = get_month_range(year, month)
+
+        business_plan = db.query(func.sum(Material.quantity * MaterialInven.price))\
+            .select_from(MaterialInven)\
+            .join(Material, Material.item_name == MaterialInven.item_name)\
+            .filter(Material.date.between(start_date.date(), end_date.date()))\
+            .scalar() or 0
+        business_amount = db.query(func.sum(MaterialInven.overall_status_quantity * MaterialInven.price))\
+            .filter(MaterialInven.date.between(start_date.date(), end_date.date()))\
+            .scalar() or 0
+        business_achievement_rate = round((business_amount / business_plan) * 100 if business_plan > 0 else 0, 2)
+
+        monthly_plan = schemas.MaterialResponse2(
+            year=year,
+            month=month,
+            business_plan=business_plan,
+            business_amount=business_amount,
+            business_achievement_rate=business_achievement_rate
+        )
+
+        materials_for_year.append(monthly_plan)
+
+    return materials_for_year
 
 #월별 material 상승률
 def get_material_rate_for_month(db: Session, year: int, month: int):
