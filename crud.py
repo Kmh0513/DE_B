@@ -203,7 +203,7 @@ def get_days_production(db: Session, start_date: datetime.date, end_date: dateti
 
 #특정날짜 production반환
 def get_day_production(db: Session, date: datetime.date):
-    production_get = db.query(Production).filter(Production.date == date).order_by(desc(Production.id)).limit(20).all()
+    production_get = db.query(Production).filter(Production.date == date).order_by(desc(Production.id)).all()
     return [production.__dict__ for production in production_get]
 
 #inventory_management CRUD
