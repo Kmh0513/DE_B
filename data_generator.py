@@ -10,21 +10,21 @@ from get_companies_list import company_names
 
     #production generate
 def generate_random_production_data():
-    date=datetime.now().date(),
-    line=f"Line{random.randint(1, 5)}",
-    operator=f"Operator{random.randint(1, 10)}",
-    item_number = f"Item_Number{number}",
-    item_name = f"Item{number}",
+    number = random.randint(1, 10)
+    date=datetime.now().date()
+    line=f"Line{random.randint(1, 5)}"
+    operator=f"Operator{random.randint(1, 10)}"
+    item_number = f"Item_Number{number}"
+    item_name = f"Item{number}"
     target_quantity = random.randint(200, 500)
     produced_quantity = random.randint(1, target_quantity) 
     production_efficiency = (produced_quantity / target_quantity) * 100
-    equipment=f"Equipment{random.randint(1, 10)}"
+    process = random.choice(["검사/조립", "사출"])
     operating_time = timedelta(hours=random.randint(0, 23), minutes=random.randint(0, 59))
     non_operating_time = timedelta(hours=random.randint(0, 23), minutes=random.randint(0, 59))
     shift=f"Shift{random.randint(1, 3)}"
     total_time = operating_time + non_operating_time
-    equipment_efficiency = (operating_time.total_seconds() / total_time.total_seconds()) * 100 if total_time.total_seconds() > 0 else 0
-    number = random.randint(1, 10)
+    line_efficiency = (operating_time.total_seconds() / total_time.total_seconds()) * 100 if total_time.total_seconds() > 0 else 0    
     model = random.choice(['가전', '건조기', '세탁기', '식기세척기', '에어컨', '중장비', '포장박스', 'LX2PE', 'GEN3.5', 'MX5'])
     specification=f"Specification{random.randint(1, 5)}"
 
@@ -38,11 +38,11 @@ def generate_random_production_data():
         target_quantity=target_quantity,
         produced_quantity=produced_quantity,
         production_efficiency=int(production_efficiency),
-        equipment=equipment,
+        process=process,
         operating_time=(datetime.min + operating_time).time(),  
         non_operating_time=(datetime.min + non_operating_time).time(),  
         shift=shift,
-        equipment_efficiency=int(equipment_efficiency),
+        line_efficiency=int(line_efficiency),
         specification=specification
     )
 
@@ -57,11 +57,11 @@ def insert_production_data(db: Session, production_data: ProductionCreate):
         target_quantity=production_data.target_quantity,
         produced_quantity=production_data.produced_quantity,
         production_efficiency=production_data.production_efficiency,
-        equipment=production_data.equipment,
+        process=production_data.process,
         operating_time=production_data.operating_time,
         non_operating_time=production_data.non_operating_time,
         shift=production_data.shift,
-        equipment_efficiency=production_data.equipment_efficiency,
+        line_efficiency=production_data.line_efficiency,
         specification=production_data.specification,
         account_idx=production_data.account_idx
     )
