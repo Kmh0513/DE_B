@@ -8,11 +8,11 @@ from database import SessionLocal
 from get_companies_list import company_names
 
 
-    #production generate
+#production generate
 def generate_random_production_data():
     number = random.randint(1, 10)
     date=datetime.now().date()
-    line=f"Line{random.randint(1, 5)}"
+    line=f"Line{random.randint(1, 10)}"
     operator=f"Operator{random.randint(1, 10)}"
     item_number = f"Item_Number{number}"
     item_name = f"Item{number}"
@@ -68,18 +68,18 @@ def insert_production_data(db: Session, production_data: ProductionCreate):
     db.add(db_production)
     db.commit()
 
-    #inventory generate
+#inventory generate
 def generate_random_inventory_data(db: Session):
     item_number_query = db.query(Production.item_number).order_by(Production.id.desc()).first()
     item_number = item_number_query[0] if item_number_query else None
     item_name_query = db.query(Production.item_name).filter(Production.item_number == item_number).order_by(Production.id.desc()).first()
     item_name = item_name_query[0] if item_name_query else None
-    price = round(random.uniform(10.0, 100.0), 2)
+    price = round(random.uniform(10, 100), 2)
     last_inventory = db.query(InventoryManagement).filter(InventoryManagement.item_number == item_number).order_by(InventoryManagement.id.desc()).first()
     basic_quantity = last_inventory.current_quantity if last_inventory else 0
     produced_quantity_query = db.query(Production.produced_quantity).filter(Production.item_number == item_number).order_by(Production.id.desc()).first()
     in_quantity = produced_quantity_query[0] if produced_quantity_query else 0
-    defective_in_quantity = random.randint(0, 20)
+    defective_in_quantity = random.randint(0, in_quantity)
     quantity = basic_quantity+in_quantity-defective_in_quantity
     out_quantity = random.randint(0, quantity)
     quantity2 = quantity-out_quantity
@@ -140,13 +140,13 @@ def insert_inventory_data(db: Session, Invetory_data: InventoryManagementCreate)
     db.add(db_inventory)
     db.commit()
 
-    #material generate
+#material generate
 def generate_random_material_data():
     number = random.randint(1, 10)
     item_number = f"Item_Number{number}"
     item_name = f"Item{number}"
     item_category = random.choice(['원재료', '부재료', '재공품', '제품', '반제품'])
-    price = round(random.uniform(10.0, 100.0), 2)
+    price = round(random.uniform(10, 100), 2)
     process = random.choice(["검사/조립", "사출"])
     client = random.choice(company_names)
     model = random.choice(['가전', '건조기', '세탁기', '식기세척기', '에어컨', '중장비', '포장박스', 'LX2PE', 'GEN3.5', 'MX5'])

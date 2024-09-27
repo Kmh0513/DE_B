@@ -161,6 +161,29 @@ def get_production_year(db: Session, year: int):
     production_get = db.query(Production).filter(extract('year', Production.date) == year).all()
     return  [production.__dict__ for production in production_get]
 
+def get_production_efficiency_for_year(db: Session, year: int) -> List[schemas.ProductionResponse]:
+    plans_for_year = []
+
+    for month in range(1, 13):
+        start_date, end_date = get_month_range(year, month)
+
+        production_efficiency = db.query(func.avg(Production.production_efficiency))\
+            .filter(Production.date.between(start_date.date(), end_date.date()))\
+            .scalar() or 0
+        line_efficiency = db.query(func.avg(Production.line_efficiency))\
+            .filter(Production.date.between(start_date.date(), end_date.date()))\
+            .scalar() or 0
+        
+        monthly_plan = schemas.ProductionResponse(
+            year=year,
+            month=month,
+            production_efficiency=int(production_efficiency),
+            line_efficiency=int(line_efficiency)
+        )
+
+        plans_for_year.append(monthly_plan)
+
+    return plans_for_year
 #production전체
 def get_all_productions(db: Session):
     production_get = db.query(Production).all()

@@ -52,6 +52,10 @@ def create_production(production: schemas.ProductionCreate, db: Session = Depend
 def get_all_productions(db: Session = Depends(get_db)):
     return crud.get_all_productions(db)
 
+@app.get("/productions/efficiency/{year}", response_model=List[schemas.ProductionResponse])
+def get_production_efficiency(year: int, db: Session = Depends(get_db)):
+    return crud.get_production_efficiency_for_year(db, year)
+
 @app.get("/productions/{year}", response_model=List[schemas.ProductionBase])
 def get_production(year: int, db: Session = Depends(get_db)):
     production = crud.get_production_year(db, year)

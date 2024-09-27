@@ -93,6 +93,12 @@ class ProductionBase(BaseModel):
     specification: str
     account_idx: int = 1
 
+class ProductionResponse(BaseModel):
+    year: int
+    month: int
+    production_efficiency: int
+    line_efficiency: int
+
 class InventoryManagementCreate(BaseModel):
     date: date
     item_number: str
