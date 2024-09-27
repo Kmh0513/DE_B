@@ -38,6 +38,11 @@ def delete_plan_route(plan_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Plan not found")
     return {"detail": "Plan deleted"}
 
+@app.get("/plans/rates/{year},{month}", response_model=List[schemas.PlanResponse2])
+def get_plan_rate_month(year: int, month: int, db: Session = Depends(get_db)):
+    plans = crud.get_plan_rate_for_month(db, year, month)
+    return plans
+
 #production 엔드포인트
 @app.post("/productions/", response_model=schemas.ProductionCreate)
 def create_production(production: schemas.ProductionCreate, db: Session = Depends(get_db)):
@@ -93,7 +98,11 @@ def create_material(material: schemas.MaterialCreate, db: Session = Depends(get_
 def get_all_materials(db: Session = Depends(get_db)):
     return crud.get_all_materials(db=db)
 
-@app.get("/materials/rate/{year},{month}", response_model=List[schemas.MaterialResponse])
+@app.get("/material/rate/{year}", response_model=List[schemas.MaterialResponse2])
+def get_material_rate(year: int, db: Session = Depends(get_db)):
+    return crud.get_material_rate_for_year(db, year)
+
+@app.get("/materials/rates/{year},{month}", response_model=List[schemas.MaterialResponse])
 def get_material_rate(year: int, month: int, db: Session = Depends(get_db)):
     materials = crud.get_material_rate_for_month(db, year, month)
     return materials

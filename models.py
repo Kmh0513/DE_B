@@ -11,6 +11,7 @@ class Plan(Base):
     item_name = Column(String(100))
     inventory = Column(Integer)
     model = Column(String(100))
+    process = Column(String(100))
     price = Column(Float)
     account_idx = Column(Integer)
 

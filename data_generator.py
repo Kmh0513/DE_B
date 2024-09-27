@@ -10,31 +10,40 @@ from get_companies_list import company_names
 
     #production generate
 def generate_random_production_data():
+    date=datetime.now().date(),
+    line=f"Line{random.randint(1, 5)}",
+    operator=f"Operator{random.randint(1, 10)}",
+    item_number = f"Item_Number{number}",
+    item_name = f"Item{number}",
     target_quantity = random.randint(200, 500)
     produced_quantity = random.randint(1, target_quantity) 
     production_efficiency = (produced_quantity / target_quantity) * 100
+    equipment=f"Equipment{random.randint(1, 10)}"
     operating_time = timedelta(hours=random.randint(0, 23), minutes=random.randint(0, 59))
     non_operating_time = timedelta(hours=random.randint(0, 23), minutes=random.randint(0, 59))
+    shift=f"Shift{random.randint(1, 3)}"
     total_time = operating_time + non_operating_time
     equipment_efficiency = (operating_time.total_seconds() / total_time.total_seconds()) * 100 if total_time.total_seconds() > 0 else 0
     number = random.randint(1, 10)
     model = random.choice(['가전', '건조기', '세탁기', '식기세척기', '에어컨', '중장비', '포장박스', 'LX2PE', 'GEN3.5', 'MX5'])
+    specification=f"Specification{random.randint(1, 5)}"
+
     return ProductionCreate(
-        date=datetime.now().date(),
-        line=f"Line{random.randint(1, 5)}",
-        operator=f"Operator{random.randint(1, 10)}",
-        item_number = f"Item_Number{number}",
-        item_name = f"Item{number}",
+        date=date,
+        line=line,
+        operator=operator,
+        item_number=item_number,
+        item_name=item_name,
         model=model,
         target_quantity=target_quantity,
         produced_quantity=produced_quantity,
         production_efficiency=int(production_efficiency),
-        equipment=f"Equipment{random.randint(1, 10)}",
+        equipment=equipment,
         operating_time=(datetime.min + operating_time).time(),  
         non_operating_time=(datetime.min + non_operating_time).time(),  
-        shift=f"Shift{random.randint(1, 3)}",
+        shift=shift,
         equipment_efficiency=int(equipment_efficiency),
-        specification=f"Specification{random.randint(1, 5)}"
+        specification=specification
     )
 
 def insert_production_data(db: Session, production_data: ProductionCreate):
@@ -138,7 +147,7 @@ def generate_random_material_data():
     item_name = f"Item{number}"
     item_category = random.choice(['원재료', '부재료', '재공품', '제품', '반제품'])
     price = round(random.uniform(10.0, 100.0), 2)
-    process = f"Process{random.randint(1, 5)}"
+    process = random.choice(["검사/조립", "사출"])
     client = random.choice(company_names)
     model = random.choice(['가전', '건조기', '세탁기', '식기세척기', '에어컨', '중장비', '포장박스', 'LX2PE', 'GEN3.5', 'MX5'])
     overall_status_quantity = random.randint(1, 100)

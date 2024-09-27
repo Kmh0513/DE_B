@@ -9,6 +9,7 @@ class PlanCreate(BaseModel):
     item_name: str
     inventory: int
     model: str
+    process: str
     price: float
     account_idx: int = 1
 
@@ -20,6 +21,7 @@ class PlanBase(BaseModel):
     item_name: str
     inventory: int
     model: str
+    process: str
     price: float
     account_idx: int = 1
 
@@ -33,6 +35,14 @@ class PlanResponse(BaseModel):
     production_achievement_rate: float
     business_achievement_rate: float
 
+class PlanResponse2(BaseModel):
+    year: int
+    month: int
+    process: str
+    previous_amount: float
+    current_amount: float
+    growth_rate: float
+
 class PlanUpdate(BaseModel):
     year: Optional[int] = None
     month: Optional[int] = None
@@ -40,6 +50,7 @@ class PlanUpdate(BaseModel):
     item_name: Optional[str] = None
     inventory: Optional[int] = None
     model: Optional[str] = None
+    process: Optional[str] = None
     price: Optional[float] = None
     
     class Config:
@@ -153,6 +164,13 @@ class MaterialResponse(BaseModel):
     previous_amount: float
     current_amount: float
     growth_rate: Optional[float] = None
+
+class MaterialResponse2(BaseModel):
+    year: int
+    month: int
+    business_plan: float
+    business_amount: float
+    business_achievement_rate: float
 
 class MaterialUpdate(BaseModel):
     date: Optional[date]
