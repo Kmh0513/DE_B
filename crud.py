@@ -363,8 +363,8 @@ def get_material_rate_for_month(db: Session, year: int, month: int):
     
     return results
 
-#material_inven 전체
-def get_all_material_invens(db: Session):
+#material_lot 전체
+def get_all_material_LOT(db: Session):
     material_get = db.query(MaterialInven).all()
     return [material.__dict__ for material in material_get]
 
@@ -416,7 +416,7 @@ def delete_material_in_out(db: Session, material_id: int):
     db.commit()
     return material
 
-def create_material_invens_management(db: Session, inventory: schemas.MaterialInvenManagementCreate):
+def create_material_invens(db: Session, inventory: schemas.MaterialInvenManagementCreate):
     db_inventory = MaterialInvenManagement(
         date=inventory.date,
         item_number=inventory.item_number,
@@ -442,15 +442,15 @@ def create_material_invens_management(db: Session, inventory: schemas.MaterialIn
     db.refresh(db_inventory)
     return db_inventory.__dict__
 
-def get_material_invens_management(db: Session, inventory_id: int):
-    material_management_get = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.id == inventory_id).first()
-    return  material_management_get
+def get_material_invens(db: Session, material_invens_id: int):
+    material_invens_get = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.id == material_invens_id).first()
+    return  material_invens_get
     
 #inventory전체
-def get_all_material_invens_management(db: Session):
-    material_management_get = db.query(MaterialInvenManagement).all()
-    return [inventory.__dict__ for inventory in material_management_get]
+def get_all_material_invens(db: Session):
+    material_invens_get = db.query(MaterialInvenManagement).all()
+    return [material_invens.__dict__ for material_invens in material_invens_get]
 
-def get_month_material_invens_management(db: Session, year: int, month: int):
-    inventory_get = db.query(MaterialInvenManagement).filter(extract('year', MaterialInvenManagement.date) == year, extract('month', MaterialInvenManagement.date) == month).order_by(desc(MaterialInvenManagement.id)).all()
-    return [inventory.__dict__ for inventory in inventory_get]
+def get_month_material_invens(db: Session, year: int, month: int):
+    material_invens_get = db.query(MaterialInvenManagement).filter(extract('year', MaterialInvenManagement.date) == year, extract('month', MaterialInvenManagement.date) == month).order_by(desc(MaterialInvenManagement.id)).all()
+    return [material_invens.__dict__ for material_invens in material_invens_get]
