@@ -224,7 +224,7 @@ class MaterialInOutManagementCreate(BaseModel):
     client: str
     delivery_quantity: int 
     defective_quantity: int 
-    settienment_quantity: int 
+    settlement_quantity: int 
     supply_amount: float 
     vat: float
     total_amount: float 
@@ -238,7 +238,7 @@ class MaterialInOutManagementBase(BaseModel):
     client: str
     delivery_quantity: int 
     defective_quantity: int 
-    settienment_quantity: int 
+    settlement_quantity: int 
     supply_amount: float 
     vat: float
     total_amount: float 
@@ -251,7 +251,7 @@ class MaterialInOutManagementUpdate(BaseModel):
     client: Optional[str] = None
     delivery_quantity: Optional[int] = None
     defective_quantity: Optional[int] = None
-    settienment_quantity: Optional[int] = None
+    settlement_quantity: Optional[int] = None
     supply_amount: Optional[float] = None
     vat: Optional[float] = None
     total_amount: Optional[float] = None

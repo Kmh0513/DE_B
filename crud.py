@@ -372,7 +372,7 @@ def create_in_out(db: Session, material: schemas.MaterialInOutManagementCreate):
         client=material.client,
         delivery_quantity=material.delivery_quantity,
         defective_quantity=material.defective_quantity,
-        settienment_quantity=material.settienment_quantity,
+        settlement_quantity=material.settlement_quantity,
         supply_amount=material.supply_amount,
         vat=material.vat,
         total_amount=material.total_amount,
