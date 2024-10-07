@@ -105,3 +105,26 @@ class MaterialInOutManagement(Base):
     total_amount = Column(Float) 
     purchase_category = Column(String(100))
     account_idx = Column(Integer)
+
+class MaterialInvenManagement(Base):
+    __tablename__ = "material_invens_managements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date)
+    item_number = Column(String(100))
+    item_name = Column(String(100))
+    price = Column(Float)
+    basic_quantity = Column(Integer)
+    basic_amount = Column(Float)
+    in_quantity = Column(Integer)
+    in_amount = Column(Float)
+    defective_in_quantity = Column(Integer)
+    defective_in_amount = Column(Float)
+    out_quantity = Column(Integer)
+    out_amount = Column(Float)
+    adjustment_quantity = Column(Integer)
+    current_quantity = Column(Integer)
+    current_amount = Column(Float)
+    lot_current_quantity = Column(Integer)
+    difference_quantity = Column(Integer)
+    account_idx = Column(Integer)
