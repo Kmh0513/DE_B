@@ -99,7 +99,7 @@ class MaterialInOutManagement(Base):
     client = Column(String(100))
     delivery_quantity = Column(Integer) 
     defective_quantity = Column(Integer) 
-    settienment_quantity = Column(Integer) 
+    settlement_quantity = Column(Integer) 
     supply_amount = Column(Float) 
     vat = Column(Float)
     total_amount = Column(Float) 
