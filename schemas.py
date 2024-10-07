@@ -259,3 +259,44 @@ class MaterialInOutManagementUpdate(BaseModel):
 
     class Config:
         orm_mode = True
+
+class MaterialInvenManagementCreate(BaseModel):
+    date: date
+    item_number: str
+    item_name: str
+    price: float
+    basic_quantity: int
+    basic_amount: float
+    in_quantity: int
+    in_amount: float
+    defective_in_quantity: int
+    defective_in_amount: float
+    out_quantity: int
+    out_amount: float
+    adjustment_quantity: int
+    current_quantity: int
+    current_amount: float
+    lot_current_quantity: int
+    difference_quantity: int
+    account_idx: int = 1
+
+class MaterialInvenManagementBase(BaseModel):
+    id: int
+    date: date
+    item_number: str
+    item_name: str
+    price: float
+    basic_quantity: int
+    basic_amount: float
+    in_quantity: int
+    in_amount: float
+    defective_in_quantity: int
+    defective_in_amount: float
+    out_quantity: int
+    out_amount: float
+    adjustment_quantity: int
+    current_quantity: int
+    current_amount: float
+    lot_current_quantity: int
+    difference_quantity: int
+    account_idx: int = 1

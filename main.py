@@ -100,6 +100,11 @@ def get_inventory(inventory_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Inventory not found")
     return inventory.__dict__
 
+@app.get("/inventories/month/", response_model=List[schemas.InventoryManagementBase])
+def get_inventory_month(year: int, month: int, db: Session = Depends(get_db)):
+    inventory = crud.get_month_inventory(db, year, month)
+    return inventory
+
 #material 엔드포인트
 @app.post("/materials/", response_model=schemas.MaterialCreate)
 def create_material(material: schemas.MaterialCreate, db: Session = Depends(get_db)):
@@ -158,3 +163,23 @@ def delete_in_out_route(material_id: int, db: Session = Depends(get_db)):
     if not deleted_in_out:
         raise HTTPException(status_code=404, detail="Material not found")
     return {"detail": "Material deleted"}
+
+@app.post("/material_invens_managements/", response_model=schemas.MaterialInvenManagementCreate)
+def create_material_inventory_management(inventory: schemas.MaterialInvenManagementCreate, db: Session = Depends(get_db)):
+    return crud.create_material_invens_management(db=db, inventory=inventory)
+
+@app.get("/material_invens_managements/all/", response_model=List[schemas.MaterialInvenManagementBase])
+def get_all_material_inventories_management(db: Session = Depends(get_db)):
+    return crud.get_all_material_invens_management(db=db)
+
+@app.get("/material_invens_managements/{inventory_id}", response_model=schemas.MaterialInvenManagementBase)
+def get_inventory(inventory_id: int, db: Session = Depends(get_db)):
+    inventory = crud.get_material_invens_management(db=db, inventory_id=inventory_id)
+    if inventory is None:
+        raise HTTPException(status_code=404, detail="Inventory not found")
+    return inventory.__dict__
+
+@app.get("/material_invens_managements/month/", response_model=List[schemas.MaterialInvenManagementBase])
+def get_material_invens_managements_month(year: int, month: int, db: Session = Depends(get_db)):
+    inventory = crud.get_month_material_invens_management(db, year, month)
+    return inventory

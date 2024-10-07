@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Plan, Production, InventoryManagement, Material, MaterialInven, MaterialInOutManagement
+from models import Plan, Production, InventoryManagement, Material, MaterialInven, MaterialInOutManagement, MaterialInvenManagement
 import schemas
 from sqlalchemy import extract, func, desc
 from typing import List
@@ -242,6 +242,10 @@ def get_all_inventories(db: Session):
     inventory_get = db.query(InventoryManagement).all()
     return [inventory.__dict__ for inventory in inventory_get]
 
+def get_month_inventory(db: Session, year: int, month: int):
+    inventory_get = db.query(InventoryManagement).filter(extract('year', InventoryManagement.date) == year, extract('month', InventoryManagement.date) == month).order_by(desc(InventoryManagement.id)).all()
+    return [inventory.__dict__ for inventory in inventory_get]
+
 #material CRUD
 def create_materials(db: Session, material: schemas.MaterialCreate):
     db_material = Material(
@@ -411,3 +415,42 @@ def delete_material_in_out(db: Session, material_id: int):
     db.delete(material)
     db.commit()
     return material
+
+def create_material_invens_management(db: Session, inventory: schemas.MaterialInvenManagementCreate):
+    db_inventory = MaterialInvenManagement(
+        date=inventory.date,
+        item_number=inventory.item_number,
+        item_name=inventory.item_name,
+        price=inventory.price,
+        basic_quantity=inventory.basic_quantity,
+        basic_amount=inventory.basic_amount,
+        in_quantity=inventory.in_quantity,
+        in_amount=inventory.in_amount,
+        defective_in_quantity=inventory.defective_in_quantity,
+        defective_in_amount=inventory.defective_in_amount,
+        out_quantity=inventory.out_quantity,
+        out_amount=inventory.out_amount,
+        adjustment_quantity=inventory.adjustment_quantity,
+        current_quantity=inventory.current_quantity,
+        current_amount=inventory.current_amount,
+        lot_current_quantity=inventory.lot_current_quantity,
+        difference_quantity=inventory.difference_quantity,
+        account_idx=inventory.account_idx
+    )
+    db.add(db_inventory)
+    db.commit()
+    db.refresh(db_inventory)
+    return db_inventory.__dict__
+
+def get_material_invens_management(db: Session, inventory_id: int):
+    material_management_get = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.id == inventory_id).first()
+    return  material_management_get
+    
+#inventory전체
+def get_all_material_invens_management(db: Session):
+    material_management_get = db.query(MaterialInvenManagement).all()
+    return [inventory.__dict__ for inventory in material_management_get]
+
+def get_month_material_invens_management(db: Session, year: int, month: int):
+    inventory_get = db.query(MaterialInvenManagement).filter(extract('year', MaterialInvenManagement.date) == year, extract('month', MaterialInvenManagement.date) == month).order_by(desc(MaterialInvenManagement.id)).all()
+    return [inventory.__dict__ for inventory in inventory_get]
