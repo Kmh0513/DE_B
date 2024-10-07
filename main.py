@@ -137,9 +137,9 @@ def delete_material_route(material_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Material not found")
     return {"detail": "Material deleted"}
 
-@app.get("/material_invens/all/", response_model=List[schemas.MaterialInvenBase])
-def get_all_materialsinven(db: Session = Depends(get_db)):
-    return crud.get_all_material_invens(db=db)
+@app.get("/material_LOT/all/", response_model=List[schemas.MaterialInvenBase])
+def get_all_materials_LOT(db: Session = Depends(get_db)):
+    return crud.get_all_material_LOT(db=db)
 
 #material_in_out 엔드포인트
 @app.post("/materials_in_out/", response_model=schemas.MaterialInOutManagementCreate)
@@ -164,22 +164,22 @@ def delete_in_out_route(material_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Material not found")
     return {"detail": "Material deleted"}
 
-@app.post("/material_invens_managements/", response_model=schemas.MaterialInvenManagementCreate)
-def create_material_inventory_management(inventory: schemas.MaterialInvenManagementCreate, db: Session = Depends(get_db)):
-    return crud.create_material_invens_management(db=db, inventory=inventory)
+@app.post("/material_invens/", response_model=schemas.MaterialInvenManagementCreate)
+def create_material_inventory(inventory: schemas.MaterialInvenManagementCreate, db: Session = Depends(get_db)):
+    return crud.create_material_invens(db=db, inventory=inventory)
 
-@app.get("/material_invens_managements/all/", response_model=List[schemas.MaterialInvenManagementBase])
-def get_all_material_inventories_management(db: Session = Depends(get_db)):
-    return crud.get_all_material_invens_management(db=db)
+@app.get("/material_invens/all/", response_model=List[schemas.MaterialInvenManagementBase])
+def get_all_material_inventories(db: Session = Depends(get_db)):
+    return crud.get_all_material_invens(db=db)
 
-@app.get("/material_invens_managements/{inventory_id}", response_model=schemas.MaterialInvenManagementBase)
-def get_inventory(inventory_id: int, db: Session = Depends(get_db)):
-    inventory = crud.get_material_invens_management(db=db, inventory_id=inventory_id)
+@app.get("/material_invens/{inventory_id}", response_model=schemas.MaterialInvenManagementBase)
+def get_material_inventories(inventory_id: int, db: Session = Depends(get_db)):
+    inventory = crud.get_material_invens(db=db, inventory_id=inventory_id)
     if inventory is None:
         raise HTTPException(status_code=404, detail="Inventory not found")
     return inventory.__dict__
 
-@app.get("/material_invens_managements/month/", response_model=List[schemas.MaterialInvenManagementBase])
-def get_material_invens_managements_month(year: int, month: int, db: Session = Depends(get_db)):
-    inventory = crud.get_month_material_invens_management(db, year, month)
+@app.get("/material_invens/month/", response_model=List[schemas.MaterialInvenManagementBase])
+def get_month_material_inventories(year: int, month: int, db: Session = Depends(get_db)):
+    inventory = crud.get_month_material_invens(db, year, month)
     return inventory
