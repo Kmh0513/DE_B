@@ -2,8 +2,8 @@ import random
 import time as t
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from models import Production, InventoryManagement,  MaterialInven
-from schemas import ProductionCreate, InventoryManagementCreate, MaterialInvenCreate
+from models import Production, InventoryManagement,  MaterialInven, MaterialInvenManagement, Material
+from schemas import ProductionCreate, InventoryManagementCreate, MaterialInvenCreate, MaterialInvenManagementCreate
 from database import SessionLocal
 from get_companies_list import company_names
 
@@ -184,6 +184,77 @@ def insert_material_data(db: Session, Material_data: MaterialInvenCreate):
     db.add(db_material)
     db.commit()
 
+def generate_random_material_inventory_data(db: Session):
+    item_number_query = random.choice(db.query(Material.item_number).order_by(Material.id.desc()).all())
+    item_number = item_number_query[0] if item_number_query else None
+    item_name_query = random.choice(db.query(Material.item_name).filter(Material.item_number == item_number).order_by(Material.id.desc()).all())
+    item_name = item_name_query[0] if item_name_query else None
+    price = round(random.uniform(10, 100), 2)
+    last_inventory = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.item_number == item_number).order_by(MaterialInvenManagement.id.desc()).first()
+    basic_quantity = last_inventory.current_quantity if last_inventory else 0
+    produced_quantity_query = db.query(Material.quantity).filter(Material.item_number == item_number).order_by(Material.id.desc()).first()
+    in_quantity = produced_quantity_query[0] if produced_quantity_query else 0
+    defective_in_quantity = random.randint(0, in_quantity)
+    quantity = basic_quantity+in_quantity-defective_in_quantity
+    out_quantity = random.randint(0, quantity)
+    quantity2 = quantity-out_quantity
+    adjustment_quantity = random.randint(-quantity2, 50)
+    current_quantity = quantity2+adjustment_quantity
+    lot_current_quantity_query = db.query(MaterialInven.overall_status_quantity).filter(MaterialInven.item_number == item_number).order_by(MaterialInven.id.desc()).first()
+    lot_current_quantity = lot_current_quantity_query[0] if lot_current_quantity_query else 0
+    basic_amount = basic_quantity * price
+    in_amount = in_quantity * price
+    defective_in_amount = defective_in_quantity * price
+    out_amount = out_quantity * price
+    current_amount = current_quantity * price
+    
+    difference_quantity = current_quantity - lot_current_quantity
+
+    return MaterialInvenManagementCreate(
+        date=datetime.now().date(),
+        item_number=item_number,
+        item_name=item_name,
+        price=price,
+        basic_quantity=basic_quantity,
+        basic_amount=basic_amount,
+        in_quantity=in_quantity,
+        in_amount=in_amount,
+        defective_in_quantity=defective_in_quantity,
+        defective_in_amount=defective_in_amount,
+        out_quantity=out_quantity,
+        out_amount=out_amount,
+        current_quantity=current_quantity,
+        current_amount=current_amount,
+        lot_current_quantity=lot_current_quantity,
+        adjustment_quantity=adjustment_quantity,
+        difference_quantity=difference_quantity
+    )
+
+def insert_material_inventory_data(db: Session, Invetory_data: MaterialInvenManagementCreate):
+        
+    db_inventory = MaterialInvenManagement(
+        date=Invetory_data.date,
+        item_number=Invetory_data.item_number,
+        item_name=Invetory_data.item_name,
+        price=Invetory_data.price,
+        basic_quantity=Invetory_data.basic_quantity,
+        basic_amount=Invetory_data.basic_amount,
+        in_quantity=Invetory_data.in_quantity,
+        in_amount=Invetory_data.in_amount,
+        defective_in_quantity=Invetory_data.defective_in_quantity,
+        defective_in_amount=Invetory_data.defective_in_amount,
+        out_quantity=Invetory_data.out_quantity,
+        out_amount=Invetory_data.out_amount,
+        adjustment_quantity=Invetory_data.adjustment_quantity,
+        current_quantity=Invetory_data.current_quantity,
+        current_amount=Invetory_data.current_amount,
+        lot_current_quantity=Invetory_data.lot_current_quantity,
+        difference_quantity=Invetory_data.difference_quantity,
+        account_idx=Invetory_data.account_idx
+    )
+    db.add(db_inventory)
+    db.commit()
+
 def main():
     db = SessionLocal()
     try:
@@ -191,11 +262,13 @@ def main():
             
             production_data = generate_random_production_data()
             insert_production_data(db, production_data)
-            material_inven_data = generate_random_material_data()
-            insert_material_data(db, material_inven_data)
+            material_LOT_data = generate_random_material_data()
+            insert_material_data(db, material_LOT_data)
+            material_inven_data = generate_random_material_inventory_data(db)
+            insert_material_inventory_data(db, material_inven_data)
             invetory_data = generate_random_inventory_data(db)
             insert_inventory_data(db, invetory_data)
-            print(f"Inserted: {production_data}, {invetory_data}, {material_inven_data}")
+            print(f"Inserted: {production_data}, {invetory_data}, {material_LOT_data}, {material_inven_data}")
             t.sleep(10) 
     finally:
         db.close()
