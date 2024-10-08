@@ -99,6 +99,26 @@ class ProductionResponse(BaseModel):
     production_efficiency: int
     line_efficiency: int
 
+class ProductionUpdate(BaseModel):
+    date: Optional[date] 
+    line: Optional[str] = None
+    operator: Optional[str] = None
+    item_number: Optional[str] = None
+    item_name: Optional[str] = None
+    model: Optional[str] = None
+    target_quantity: Optional[int] = None
+    produced_quantity: Optional[int] = None
+    production_efficiency: Optional[int] = None
+    process: Optional[str] = None
+    operating_time: Optional[time] = None
+    non_operating_time: Optional[time] = None
+    shift: Optional[str] = None
+    line_efficiency: Optional[int] = None
+    specification: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
 class InventoryManagementCreate(BaseModel):
     date: date
     item_number: str
@@ -139,6 +159,28 @@ class InventoryManagementBase(BaseModel):
     lot_current_quantity: int
     difference_quantity: int
     account_idx: int = 1
+
+class InventoryManagementUpdate(BaseModel):
+    date: Optional[date]
+    item_number: Optional[str]
+    item_name: Optional[str]
+    price: Optional[float]
+    basic_quantity: Optional[int]
+    basic_amount: Optional[float]
+    in_quantity: Optional[int]
+    in_amount: Optional[float]
+    defective_in_quantity: Optional[int]
+    defective_in_amount: Optional[float]
+    out_quantity: Optional[int]
+    out_amount: Optional[float]
+    adjustment_quantity: Optional[int]
+    current_quantity: Optional[int]
+    current_amount: Optional[float]
+    lot_current_quantity: Optional[int]
+    difference_quantity: Optional[int]
+
+    class Config:
+        orm_mode = True
 
 class MaterialCreate(BaseModel):
     date: date
@@ -300,3 +342,25 @@ class MaterialInvenManagementBase(BaseModel):
     lot_current_quantity: int
     difference_quantity: int
     account_idx: int = 1
+
+class MaterialInvenManagementUpdate(BaseModel):
+    date: Optional[date]
+    item_number: Optional[str]
+    item_name: Optional[str]
+    price: Optional[float]
+    basic_quantity: Optional[int]
+    basic_amount: Optional[float]
+    in_quantity: Optional[int]
+    in_amount: Optional[float]
+    defective_in_quantity: Optional[int]
+    defective_in_amount: Optional[float]
+    out_quantity: Optional[int]
+    out_amount: Optional[float]
+    adjustment_quantity: Optional[int]
+    current_quantity: Optional[int]
+    current_amount: Optional[float]
+    lot_current_quantity: Optional[int]
+    difference_quantity: Optional[int]
+
+    class Config:
+        orm_mode = True

@@ -206,6 +206,29 @@ def get_day_production(db: Session, date: datetime.date):
     production_get = db.query(Production).filter(Production.date == date).order_by(desc(Production.id)).all()
     return [production.__dict__ for production in production_get]
 
+def update_production(db: Session, production_id: int, production_update: schemas.ProductionUpdate):
+    production = db.query(Production).filter(Production.id == production_id).first()
+    
+    if not production:
+        return None  
+    
+    for var, value in vars(production_update).items():
+        setattr(production, var, value)  
+        
+    db.commit()
+    db.refresh(production)  
+    return production
+
+def delete_production(db: Session, production_id: int):
+    production = db.query(Production).filter(Production.id == production_id).first()
+    
+    if not production:
+        return None
+    
+    db.delete(production)
+    db.commit()
+    return production
+
 #inventory_management CRUD
 def create_inventory_management(db: Session, inventory: schemas.InventoryManagementCreate):
     db_inventory = InventoryManagement(
@@ -245,6 +268,29 @@ def get_all_inventories(db: Session):
 def get_month_inventory(db: Session, year: int, month: int):
     inventory_get = db.query(InventoryManagement).filter(extract('year', InventoryManagement.date) == year, extract('month', InventoryManagement.date) == month).order_by(desc(InventoryManagement.id)).all()
     return [inventory.__dict__ for inventory in inventory_get]
+
+def update_inventory(db: Session, inventory_id: int, inventory_update: schemas.InventoryManagementUpdate):
+    inventory = db.query(InventoryManagement).filter(InventoryManagement.id == inventory_id).first()
+    
+    if not inventory:
+        return None  
+    
+    for var, value in vars(inventory_update).items():
+        setattr(inventory, var, value)  
+        
+    db.commit()
+    db.refresh(inventory)  
+    return inventory
+
+def delete_inventory(db: Session, inventory_id: int):
+    inventory = db.query(InventoryManagement).filter(InventoryManagement.id == inventory_id).first()
+    
+    if not inventory:
+        return None
+    
+    db.delete(inventory)
+    db.commit()
+    return inventory
 
 #material CRUD
 def create_materials(db: Session, material: schemas.MaterialCreate):
@@ -416,6 +462,7 @@ def delete_material_in_out(db: Session, material_id: int):
     db.commit()
     return material
 
+#material_inven_management CRUD
 def create_material_invens(db: Session, inventory: schemas.MaterialInvenManagementCreate):
     db_inventory = MaterialInvenManagement(
         date=inventory.date,
@@ -446,7 +493,7 @@ def get_material_invens(db: Session, material_invens_id: int):
     material_invens_get = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.id == material_invens_id).first()
     return  material_invens_get
     
-#inventory전체
+#material_inven_management전체
 def get_all_material_invens(db: Session):
     material_invens_get = db.query(MaterialInvenManagement).all()
     return [material_invens.__dict__ for material_invens in material_invens_get]
@@ -454,3 +501,26 @@ def get_all_material_invens(db: Session):
 def get_month_material_invens(db: Session, year: int, month: int):
     material_invens_get = db.query(MaterialInvenManagement).filter(extract('year', MaterialInvenManagement.date) == year, extract('month', MaterialInvenManagement.date) == month).order_by(desc(MaterialInvenManagement.id)).all()
     return [material_invens.__dict__ for material_invens in material_invens_get]
+
+def update_material_invens(db: Session, inventory_id: int, inventory_update: schemas.MaterialInvenManagementUpdate):
+    inventory = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.id == inventory_id).first()
+    
+    if not inventory:
+        return None  
+    
+    for var, value in vars(inventory_update).items():
+        setattr(inventory, var, value)  
+        
+    db.commit()
+    db.refresh(inventory)  
+    return inventory
+
+def delete_material_invens(db: Session, inventory_id: int):
+    inventory = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.id == inventory_id).first()
+    
+    if not inventory:
+        return None
+    
+    db.delete(inventory)
+    db.commit()
+    return inventory

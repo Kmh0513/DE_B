@@ -84,6 +84,20 @@ def get_production(production_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Production not found")
     return production.__dict__
 
+@app.put("/productions/{production_id}", response_model=schemas.ProductionUpdate)
+def update_production_route(production_id: int, productions_update: schemas.ProductionUpdate, db: Session = Depends(get_db)):
+    updated_productions = crud.update_production(db, production_id, productions_update)
+    if not updated_productions:
+        raise HTTPException(status_code=404, detail="Production not found")
+    return updated_productions
+
+@app.delete("/productions/{production_id}")
+def delete_production_route(production_id: int, db: Session = Depends(get_db)):
+    deleted_production = crud.delete_production(db, production_id)
+    if not deleted_production:
+        raise HTTPException(status_code=404, detail="Production not found")
+    return {"detail": "Production deleted"}
+
 #inventory 엔드포인트
 @app.post("/inventories/", response_model=schemas.InventoryManagementCreate)
 def create_inventory_management(inventory: schemas.InventoryManagementCreate, db: Session = Depends(get_db)):
@@ -104,6 +118,20 @@ def get_inventory(inventory_id: int, db: Session = Depends(get_db)):
 def get_inventory_month(year: int, month: int, db: Session = Depends(get_db)):
     inventory = crud.get_month_inventory(db, year, month)
     return inventory
+
+@app.put("/inventories/{inventory_id}", response_model=schemas.InventoryManagementUpdate)
+def update_inventory_route(inventory_id: int, inventory_update: schemas.InventoryManagementUpdate, db: Session = Depends(get_db)):
+    updated_inventory = crud.update_inventory(db, inventory_id, inventory_update)
+    if not updated_inventory:
+        raise HTTPException(status_code=404, detail="Inventory not found")
+    return updated_inventory
+
+@app.delete("/inventories/{inventory_id}")
+def delete_inventory_route(inventory_id: int, db: Session = Depends(get_db)):
+    deleted_inventory = crud.delete_inventory(db, inventory_id)
+    if not deleted_inventory:
+        raise HTTPException(status_code=404, detail="Inventory not found")
+    return {"detail": "Inventory deleted"}
 
 #material 엔드포인트
 @app.post("/materials/", response_model=schemas.MaterialCreate)
@@ -183,3 +211,17 @@ def get_material_inventories(inventory_id: int, db: Session = Depends(get_db)):
 def get_month_material_inventories(year: int, month: int, db: Session = Depends(get_db)):
     inventory = crud.get_month_material_invens(db, year, month)
     return inventory
+
+@app.put("/material_invens/{inventory_id}", response_model=schemas.MaterialInvenManagementUpdate)
+def update_material_invens_route(inventory_id: int, inventory_update: schemas.MaterialInvenManagementUpdate, db: Session = Depends(get_db)):
+    updated_inventory = crud.update_material_invens(db, inventory_id, inventory_update)
+    if not updated_inventory:
+        raise HTTPException(status_code=404, detail="Inventory not found")
+    return updated_inventory
+
+@app.delete("/material_invens/{inventory_id}")
+def delete_material_invens_route(inventory_id: int, db: Session = Depends(get_db)):
+    deleted_inventory = crud.delete_material_invens(db, inventory_id)
+    if not deleted_inventory:
+        raise HTTPException(status_code=404, detail="Inventory not found")
+    return {"detail": "Inventory deleted"}
