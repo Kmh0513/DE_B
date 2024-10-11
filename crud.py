@@ -40,20 +40,17 @@ def get_plans_rate_for_year(db: Session, year: int) -> List[schemas.PlanResponse
 
     for month in range(1, 13):
         start_date, end_date = get_month_range(year, month)
-
         prod_plan = db.query(func.sum(Plan.inventory)).filter(Plan.year == year, Plan.month == month).scalar() or 0
         business_plan = db.query(func.sum(Plan.inventory * Plan.price)).filter(Plan.year == year, Plan.month == month).scalar() or 0
-
         prod_amount = db.query(func.sum(Production.produced_quantity)).filter(Production.date.between(start_date.date(), end_date.date())).scalar() or 0
         business_amount = db.query(func.sum(Production.produced_quantity * Plan.price))\
             .select_from(Production)\
             .join(Plan, Plan.item_name == Production.item_name)\
             .filter(Production.date.between(start_date.date(), end_date.date()))\
             .scalar() or 0
-
         production_achievement_rate = round((prod_amount / prod_plan) * 100 if prod_plan > 0 else 0, 2)
         business_achievement_rate = round((business_amount / business_plan) * 100 if business_plan > 0 else 0, 2)
-
+        
         monthly_plan = schemas.PlanResponse(
             year=year,
             month=month,
@@ -64,31 +61,25 @@ def get_plans_rate_for_year(db: Session, year: int) -> List[schemas.PlanResponse
             production_achievement_rate=production_achievement_rate,
             business_achievement_rate=business_achievement_rate
         )
-
         plans_for_year.append(monthly_plan)
-
     return plans_for_year
 
 #월별 plan 상승률
 def get_plan_rate_for_month(db: Session, year: int, month: int):
-
     previous_month = (month - 1) or 12
-
     current_data = db.query(func.sum(Plan.inventory*InventoryManagement.price).label("current_amount"), Plan.process)\
         .select_from(InventoryManagement)\
         .join(Plan, Plan.item_name == InventoryManagement.item_name)\
         .filter(Plan.year == year, Plan.month == month)\
         .group_by(Plan.process).all()
-
     previous_data = db.query(func.sum(Plan.inventory*InventoryManagement.price).label("previous_amount"), Plan.process)\
         .select_from(InventoryManagement)\
         .join(Plan, Plan.item_name == InventoryManagement.item_name)\
         .filter(Plan.year == year, Plan.month == previous_month)\
         .group_by(Plan.process).all()
-
     previous_map = {data.process: data.previous_amount for data in previous_data}
-
     results = []
+
     for current in current_data:
         previous_amount = previous_map.get(current.process, 0)
         growth_rate = ((current.current_amount - previous_amount) / previous_amount * 100) if previous_amount else 0
@@ -102,7 +93,6 @@ def get_plan_rate_for_month(db: Session, year: int, month: int):
             growth_rate=growth_rate
         )
         results.append(result)
-    
     return results
 
 def update_plan(db: Session, plan_id: int, plan_update: schemas.PlanUpdate):
@@ -166,7 +156,6 @@ def get_production_efficiency_for_year(db: Session, year: int) -> List[schemas.P
 
     for month in range(1, 13):
         start_date, end_date = get_month_range(year, month)
-
         production_efficiency = db.query(func.avg(Production.production_efficiency))\
             .filter(Production.date.between(start_date.date(), end_date.date()))\
             .scalar() or 0
@@ -180,9 +169,7 @@ def get_production_efficiency_for_year(db: Session, year: int) -> List[schemas.P
             production_efficiency=int(production_efficiency),
             line_efficiency=int(line_efficiency)
         )
-
         plans_for_year.append(monthly_plan)
-
     return plans_for_year
 #production전체
 def get_all_productions(db: Session):
@@ -191,6 +178,7 @@ def get_all_productions(db: Session):
 
 def get_days_production(db: Session, start_date: datetime.date, end_date: datetime.date, operator: str , item_number: str , item_name: str):
     querys = db.query(Production).filter(Production.date.between(start_date, end_date))
+    
     if operator:
         querys = querys.filter(Production.operator == operator)
     if item_number:
@@ -343,7 +331,6 @@ def get_material_rate_for_year(db: Session, year: int) -> List[schemas.MaterialR
 
     for month in range(1, 13):
         start_date, end_date = get_month_range(year, month)
-
         business_plan = db.query(func.sum(Material.quantity * MaterialInven.price))\
             .select_from(MaterialInven)\
             .join(Material, Material.item_name == MaterialInven.item_name)\
@@ -361,9 +348,7 @@ def get_material_rate_for_year(db: Session, year: int) -> List[schemas.MaterialR
             business_amount=business_amount,
             business_achievement_rate=business_achievement_rate
         )
-
         materials_for_year.append(monthly_plan)
-
     return materials_for_year
 
 #월별 material 상승률
@@ -372,27 +357,23 @@ def get_material_rate_for_month(db: Session, year: int, month: int):
     current_start_date = datetime(year, month, 1)
     next_month = month % 12 + 1
     current_end_date = datetime(year, next_month, 1) - timedelta(days=1)
-
     previous_month = (month - 1) or 12
     previous_year = year - 1 if month == 1 else year
     previous_start_date = datetime(previous_year, previous_month, 1)
     previous_end_date = datetime(year, month, 1) - timedelta(days=1)
-
     current_data = db.query(func.sum(Material.quantity*MaterialInven.price).label("current_amount"), Material.client)\
         .select_from(MaterialInven)\
         .join(Material, Material.item_name == MaterialInven.item_name)\
         .filter(Material.date >= current_start_date, Material.date <= current_end_date)\
         .group_by(Material.client).all()
-
     previous_data = db.query(func.sum(Material.quantity*MaterialInven.price).label("previous_amount"), Material.client)\
         .select_from(MaterialInven)\
         .join(Material, Material.item_name == MaterialInven.item_name)\
         .filter(Material.date >= previous_start_date, Material.date <= previous_end_date)\
         .group_by(Material.client).all()
-
     previous_map = {data.client: data.previous_amount for data in previous_data}
-
     results = []
+
     for current in current_data:
         previous_amount = previous_map.get(current.client, 0)
         growth_rate = ((current.current_amount - previous_amount) / previous_amount * 100) if previous_amount else 0
@@ -406,7 +387,6 @@ def get_material_rate_for_month(db: Session, year: int, month: int):
             growth_rate=growth_rate
         )
         results.append(result)
-    
     return results
 
 #material_lot 전체

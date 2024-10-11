@@ -15,7 +15,6 @@ class Plan(Base):
     price = Column(Float)
     account_idx = Column(Integer)
 
-
 class Production(Base):
     __tablename__ = "productions"
 

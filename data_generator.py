@@ -92,7 +92,6 @@ def generate_random_inventory_data(db: Session):
     defective_in_amount = defective_in_quantity * price
     out_amount = out_quantity * price
     current_amount = current_quantity * price
-    
     difference_quantity = current_quantity - lot_current_quantity
 
     return InventoryManagementCreate(
@@ -207,7 +206,6 @@ def generate_random_material_inventory_data(db: Session):
     defective_in_amount = defective_in_quantity * price
     out_amount = out_quantity * price
     current_amount = current_quantity * price
-    
     difference_quantity = current_quantity - lot_current_quantity
 
     return MaterialInvenManagementCreate(
@@ -259,7 +257,6 @@ def main():
     db = SessionLocal()
     try:
         while True:
-            
             production_data = generate_random_production_data()
             insert_production_data(db, production_data)
             material_LOT_data = generate_random_material_data()
