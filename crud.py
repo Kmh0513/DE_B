@@ -502,6 +502,23 @@ def get_month_material_invens(db: Session, year: int, month: int):
     material_invens_get = db.query(MaterialInvenManagement).filter(extract('year', MaterialInvenManagement.date) == year, extract('month', MaterialInvenManagement.date) == month).order_by(desc(MaterialInvenManagement.id)).all()
     return [material_invens.__dict__ for material_invens in material_invens_get]
 
+def get_material_invens_data(db: Session, year: int):
+    material_invens_data = db.query(MaterialInvenManagement.date, MaterialInvenManagement.in_amount).filter(extract('year', MaterialInvenManagement.date) == year).all()
+    df = pd.DataFrame(material_invens_data, columns=['date', 'in_amount'])
+    df['date'] = pd.to_datetime(df['date'])
+    df_monthly = df.resample('M', on='date').sum().reset_index()
+    return df_monthly
+
+def predict_material_invens(db: Session, year : int, forecast_months: int):
+    df = get_material_invens_data(db, year)
+    if df.empty:
+        return []
+    model = ExponentialSmoothing(df['in_amount'], trend="add", seasonal=None)
+    model_fit = model.fit()
+    forecast = model_fit.forecast(forecast_months)
+    forecast_dates = pd.date_range(start=df['date'].iloc[-1] + pd.DateOffset(months=1), periods=forecast_months, freq='M')
+    return list(zip(forecast_dates, forecast))
+
 def update_material_invens(db: Session, inventory_id: int, inventory_update: schemas.MaterialInvenManagementUpdate):
     inventory = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.id == inventory_id).first()
     
