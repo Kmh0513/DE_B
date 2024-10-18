@@ -178,7 +178,7 @@ def get_production_data(db: Session, year: int):
     production_data = db.query(Production.date, Production.produced_quantity).filter(extract('year', Production.date) == year).all()
     df = pd.DataFrame(production_data, columns=['date', 'produced_quantity'])
     df['date'] = pd.to_datetime(df['date'])
-    df_monthly = df.resample('ME', on='date').sum().reset_index()
+    df_monthly = df.resample('M', on='date').sum().reset_index()
     return df_monthly
 
 def predict_production(db: Session, year : int, forecast_months: int):
@@ -188,7 +188,7 @@ def predict_production(db: Session, year : int, forecast_months: int):
     model = ExponentialSmoothing(df['produced_quantity'], trend="add", seasonal=None)
     model_fit = model.fit()
     forecast = model_fit.forecast(forecast_months)
-    forecast_dates = pd.date_range(start=df['date'].iloc[-1] + pd.DateOffset(months=1), periods=forecast_months, freq='ME')
+    forecast_dates = pd.date_range(start=df['date'].iloc[-1] + pd.DateOffset(months=1), periods=forecast_months, freq='M')
     return list(zip(forecast_dates, forecast))
 
 #production전체
