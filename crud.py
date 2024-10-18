@@ -174,22 +174,19 @@ def get_production_efficiency_for_year(db: Session, year: int) -> List[schemas.P
         plans_for_year.append(monthly_plan)
     return plans_for_year
 
-def get_production_data(db: Session, year: int):
-    production_data = db.query(Production.date, Production.produced_quantity).filter(extract('year', Production.date) == year).all()
-    df = pd.DataFrame(production_data, columns=['date', 'produced_quantity'])
+def predict_production(db: Session, forecast_months: int):
+    data = db.query(Production).all()
+    df = pd.DataFrame([{
+        'date': production.date,
+        'produced_quantity': production.produced_quantity
+    } for production in data])
     df['date'] = pd.to_datetime(df['date'])
     df_monthly = df.resample('M', on='date').sum().reset_index()
-    return df_monthly
-
-def predict_production(db: Session, year : int, forecast_months: int):
-    df = get_production_data(db, year)
-    if df.empty:
-        return []
-    model = ExponentialSmoothing(df['produced_quantity'], trend="add", seasonal=None)
-    model_fit = model.fit()
-    forecast = model_fit.forecast(forecast_months)
-    forecast_dates = pd.date_range(start=df['date'].iloc[-1] + pd.DateOffset(months=1), periods=forecast_months, freq='M')
-    return list(zip(forecast_dates, forecast))
+    model = ExponentialSmoothing(df_monthly['produced_quantity'], trend='add', seasonal=None).fit()
+    forecast = model.forecast(steps=forecast_months)
+    forecast_dates = pd.date_range(start=df_monthly['date'].iloc[-1] + pd.DateOffset(months=1), periods=forecast_months, freq='M')
+    forecast_result = [{"date": date.strftime('%Y-%m'), "month_quantity": value} for date, value in zip(forecast_dates, forecast)]
+    return forecast_result
 
 #production전체
 def get_all_productions(db: Session):
@@ -502,22 +499,19 @@ def get_month_material_invens(db: Session, year: int, month: int):
     material_invens_get = db.query(MaterialInvenManagement).filter(extract('year', MaterialInvenManagement.date) == year, extract('month', MaterialInvenManagement.date) == month).order_by(desc(MaterialInvenManagement.id)).all()
     return [material_invens.__dict__ for material_invens in material_invens_get]
 
-def get_material_invens_data(db: Session, year: int):
-    material_invens_data = db.query(MaterialInvenManagement.date, MaterialInvenManagement.in_amount).filter(extract('year', MaterialInvenManagement.date) == year).all()
-    df = pd.DataFrame(material_invens_data, columns=['date', 'in_amount'])
+def predict_material_invens(db: Session, forecast_months: int):
+    data = db.query(MaterialInvenManagement).all()
+    df = pd.DataFrame([{
+        'date': material_invens.date,
+        'in_amount': material_invens.in_amount
+    } for material_invens in data])
     df['date'] = pd.to_datetime(df['date'])
     df_monthly = df.resample('M', on='date').sum().reset_index()
-    return df_monthly
-
-def predict_material_invens(db: Session, year : int, forecast_months: int):
-    df = get_material_invens_data(db, year)
-    if df.empty:
-        return []
-    model = ExponentialSmoothing(df['in_amount'], trend="add", seasonal=None)
-    model_fit = model.fit()
-    forecast = model_fit.forecast(forecast_months)
-    forecast_dates = pd.date_range(start=df['date'].iloc[-1] + pd.DateOffset(months=1), periods=forecast_months, freq='M')
-    return list(zip(forecast_dates, forecast))
+    model = ExponentialSmoothing(df_monthly['in_amount'], trend='add', seasonal=None).fit()
+    forecast = model.forecast(steps=forecast_months)
+    forecast_dates = pd.date_range(start=df_monthly['date'].iloc[-1] + pd.DateOffset(months=1), periods=forecast_months, freq='M')
+    forecast_result = [{"date": date.strftime('%Y-%m'), "month_amount": value} for date, value in zip(forecast_dates, forecast)]
+    return forecast_result
 
 def update_material_invens(db: Session, inventory_id: int, inventory_update: schemas.MaterialInvenManagementUpdate):
     inventory = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.id == inventory_id).first()
