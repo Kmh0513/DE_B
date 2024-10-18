@@ -85,12 +85,11 @@ def get_production(production_id: int, db: Session = Depends(get_db)):
     return production.__dict__
 
 @app.get("/productions/predict/")
-def get_production_forecast(year: int, forecast_months: int, db: Session = Depends(get_db)):
-    forecast = crud.predict_production(db, year, forecast_months)
-    simplified_forecast = [[date.strftime("%Y-%m"), production] for date, production in forecast]
-    if simplified_forecast is None:
+def get_production_forecast(forecast_months: int, db: Session = Depends(get_db)):
+    forecast = crud.predict_production(db, forecast_months)
+    if not forecast:
         raise HTTPException(status_code=404, detail="Forecast not found")
-    return {"forecast_months": forecast_months, "predicted_production": simplified_forecast}
+    return {"forecast_months": forecast_months, "predicted_productions": forecast}
 
 @app.put("/productions/{production_id}", response_model=schemas.ProductionUpdate)
 def update_production(production_id: int, productions_update: schemas.ProductionUpdate, db: Session = Depends(get_db)):
@@ -221,12 +220,11 @@ def get_month_material_inventories(year: int, month: int, db: Session = Depends(
     return inventory
 
 @app.get("/material_invens/predict/")
-def get_material_invens_forecast(year: int, forecast_months: int, db: Session = Depends(get_db)):
-    forecast = crud.predict_material_invens(db, year, forecast_months)
-    simplified_forecast = [[date.strftime("%Y-%m"), amount] for date, amount in forecast]
-    if simplified_forecast is None:
+def get_material_invens_forecast(forecast_months: int, db: Session = Depends(get_db)):
+    forecast = crud.predict_material_invens(db, forecast_months)
+    if not forecast:
         raise HTTPException(status_code=404, detail="Forecast not found")
-    return {"forecast_months": forecast_months, "predicted_material_invens": simplified_forecast}
+    return {"forecast_months": forecast_months, "predicted_material_invens": forecast}
 
 @app.put("/material_invens/{inventory_id}", response_model=schemas.MaterialInvenManagementUpdate)
 def update_material_invens(inventory_id: int, inventory_update: schemas.MaterialInvenManagementUpdate, db: Session = Depends(get_db)):
