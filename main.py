@@ -220,6 +220,14 @@ def get_month_material_inventories(year: int, month: int, db: Session = Depends(
     inventory = crud.get_month_material_invens(db, year, month)
     return inventory
 
+@app.get("/material_invens/predict/")
+def get_material_invens_forecast(year: int, forecast_months: int, db: Session = Depends(get_db)):
+    forecast = crud.predict_material_invens(db, year, forecast_months)
+    simplified_forecast = [[date.strftime("%Y-%m"), amount] for date, amount in forecast]
+    if simplified_forecast is None:
+        raise HTTPException(status_code=404, detail="Forecast not found")
+    return {"forecast_months": forecast_months, "predicted_material_invens": simplified_forecast}
+
 @app.put("/material_invens/{inventory_id}", response_model=schemas.MaterialInvenManagementUpdate)
 def update_material_invens(inventory_id: int, inventory_update: schemas.MaterialInvenManagementUpdate, db: Session = Depends(get_db)):
     updated_inventory = crud.update_material_invens(db, inventory_id, inventory_update)
