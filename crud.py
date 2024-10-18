@@ -4,6 +4,8 @@ import schemas
 from sqlalchemy import extract, func, desc
 from typing import List
 from datetime import datetime, timedelta
+import pandas as pd
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 #기간 계산 함수
 def get_month_range(year: int, month: int):
@@ -171,6 +173,24 @@ def get_production_efficiency_for_year(db: Session, year: int) -> List[schemas.P
         )
         plans_for_year.append(monthly_plan)
     return plans_for_year
+
+def get_production_data(db: Session, year: int):
+    production_data = db.query(Production.date, Production.produced_quantity).filter(extract('year', Production.date) == year).all()
+    df = pd.DataFrame(production_data, columns=['date', 'produced_quantity'])
+    df['date'] = pd.to_datetime(df['date'])
+    df_monthly = df.resample('ME', on='date').sum().reset_index()
+    return df_monthly
+
+def predict_production(db: Session, year : int, forecast_months: int):
+    df = get_production_data(db, year)
+    if df.empty:
+        return []
+    model = ExponentialSmoothing(df['produced_quantity'], trend="add", seasonal=None)
+    model_fit = model.fit()
+    forecast = model_fit.forecast(forecast_months)
+    forecast_dates = pd.date_range(start=df['date'].iloc[-1] + pd.DateOffset(months=1), periods=forecast_months, freq='ME')
+    return list(zip(forecast_dates, forecast))
+
 #production전체
 def get_all_productions(db: Session):
     production_get = db.query(Production).all()

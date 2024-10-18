@@ -84,6 +84,14 @@ def get_production(production_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Production not found")
     return production.__dict__
 
+@app.get("/productions/predict/")
+def get_production_forecast(year: int, forecast_months: int, db: Session = Depends(get_db)):
+    forecast = crud.predict_production(db, year, forecast_months)
+    simplified_forecast = [[date.strftime("%Y-%m"), production] for date, production in forecast]
+    if simplified_forecast is None:
+        raise HTTPException(status_code=404, detail="Forecast not found")
+    return {"forecast_months": forecast_months, "predicted_production": simplified_forecast}
+
 @app.put("/productions/{production_id}", response_model=schemas.ProductionUpdate)
 def update_production(production_id: int, productions_update: schemas.ProductionUpdate, db: Session = Depends(get_db)):
     updated_productions = crud.update_production(db, production_id, productions_update)
