@@ -14,6 +14,7 @@ def get_month_range(year: int, month: int):
     return start_date, end_date
 
 #plan CRUD
+#plan Create
 def create_plan(db: Session, plan: schemas.PlanCreate):
     db_plan = Plan(
         year=plan.year,
@@ -97,6 +98,7 @@ def get_plan_rate_for_month(db: Session, year: int, month: int):
         results.append(result)
     return results
 
+#plan Update
 def update_plan(db: Session, plan_id: int, plan_update: schemas.PlanUpdate):
     plan = db.query(Plan).filter(Plan.id == plan_id).first()
     
@@ -110,6 +112,7 @@ def update_plan(db: Session, plan_id: int, plan_update: schemas.PlanUpdate):
     db.refresh(plan)  
     return plan
 
+#plan Delete
 def delete_plan(db: Session, plan_id: int):
     plan = db.query(Plan).filter(Plan.id == plan_id).first()
     
@@ -121,6 +124,7 @@ def delete_plan(db: Session, plan_id: int):
     return plan
 
 #production CRUD
+#production Create
 def create_production(db: Session, production: schemas.ProductionCreate):
     db_production = Production(
         date=production.date,
@@ -211,6 +215,7 @@ def get_day_production(db: Session, date: datetime.date):
     production_get = db.query(Production).filter(Production.date == date).order_by(desc(Production.id)).all()
     return [production.__dict__ for production in production_get]
 
+#production Upadate
 def update_production(db: Session, production_id: int, production_update: schemas.ProductionUpdate):
     production = db.query(Production).filter(Production.id == production_id).first()
     
@@ -224,6 +229,7 @@ def update_production(db: Session, production_id: int, production_update: schema
     db.refresh(production)  
     return production
 
+#production Delete
 def delete_production(db: Session, production_id: int):
     production = db.query(Production).filter(Production.id == production_id).first()
     
@@ -235,6 +241,7 @@ def delete_production(db: Session, production_id: int):
     return production
 
 #inventory_management CRUD
+#inventory_management Create
 def create_inventory_management(db: Session, inventory: schemas.InventoryManagementCreate):
     db_inventory = InventoryManagement(
         date=inventory.date,
@@ -274,6 +281,7 @@ def get_month_inventory(db: Session, year: int, month: int):
     inventory_get = db.query(InventoryManagement).filter(extract('year', InventoryManagement.date) == year, extract('month', InventoryManagement.date) == month).order_by(desc(InventoryManagement.id)).all()
     return [inventory.__dict__ for inventory in inventory_get]
 
+#inventory_management Update
 def update_inventory(db: Session, inventory_id: int, inventory_update: schemas.InventoryManagementUpdate):
     inventory = db.query(InventoryManagement).filter(InventoryManagement.id == inventory_id).first()
     
@@ -287,6 +295,7 @@ def update_inventory(db: Session, inventory_id: int, inventory_update: schemas.I
     db.refresh(inventory)  
     return inventory
 
+#inventory_management Delete
 def delete_inventory(db: Session, inventory_id: int):
     inventory = db.query(InventoryManagement).filter(InventoryManagement.id == inventory_id).first()
     
@@ -298,6 +307,7 @@ def delete_inventory(db: Session, inventory_id: int):
     return inventory
 
 #material CRUD
+#material Create
 def create_materials(db: Session, material: schemas.MaterialCreate):
     db_material = Material(
         date=material.date,
@@ -320,6 +330,7 @@ def get_all_materials(db: Session):
     material_get = db.query(Material).all()
     return [material.__dict__ for material in material_get]
 
+#material Update
 def update_material(db: Session, material_id: int, material_update: schemas.MaterialUpdate):
     material = db.query(Material).filter(Material.id == material_id).first()
     
@@ -333,6 +344,7 @@ def update_material(db: Session, material_id: int, material_update: schemas.Mate
     db.refresh(material)  
     return material
 
+#material Delete
 def delete_material(db: Session, material_id: int):
     material = db.query(Material).filter(Material.id == material_id).first()
     
@@ -411,7 +423,8 @@ def get_all_material_LOT(db: Session):
     material_get = db.query(MaterialInven).all()
     return [material.__dict__ for material in material_get]
 
-#material_in_out_management
+#material_in_out_management CRUD
+#material_in_out_management Create
 def create_in_out(db: Session, material: schemas.MaterialInOutManagementCreate):
     db_material = MaterialInOutManagement(
         date=material.date,
@@ -436,6 +449,7 @@ def get_all_materials_in_out(db: Session):
     material_get = db.query(MaterialInOutManagement).all()
     return [material.__dict__ for material in material_get]
 
+#material_in_out_management Update
 def update_material_in_out(db: Session, material_id: int, material_update: schemas.MaterialInOutManagementUpdate):
     material = db.query(MaterialInOutManagement).filter(MaterialInOutManagement.id == material_id).first()
     
@@ -449,6 +463,7 @@ def update_material_in_out(db: Session, material_id: int, material_update: schem
     db.refresh(material)  
     return material
 
+#material_in_out_management Delete
 def delete_material_in_out(db: Session, material_id: int):
     material = db.query(MaterialInOutManagement).filter(MaterialInOutManagement.id == material_id).first()
     
@@ -499,7 +514,7 @@ def get_month_material_invens(db: Session, year: int, month: int):
     material_invens_get = db.query(MaterialInvenManagement).filter(extract('year', MaterialInvenManagement.date) == year, extract('month', MaterialInvenManagement.date) == month).order_by(desc(MaterialInvenManagement.id)).all()
     return [material_invens.__dict__ for material_invens in material_invens_get]
 
-def predict_material_invens(db: Session, forecast_months: int):
+def get_predict_material_invens(db: Session, forecast_months: int):
     data = db.query(MaterialInvenManagement).all()
     df = pd.DataFrame([{
         'date': material_invens.date,
@@ -513,6 +528,7 @@ def predict_material_invens(db: Session, forecast_months: int):
     forecast_result = [{"date": date.strftime('%Y-%m'), "month_amount": value} for date, value in zip(forecast_dates, forecast)]
     return forecast_result
 
+#material_inven_management Update
 def update_material_invens(db: Session, inventory_id: int, inventory_update: schemas.MaterialInvenManagementUpdate):
     inventory = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.id == inventory_id).first()
     
@@ -526,6 +542,7 @@ def update_material_invens(db: Session, inventory_id: int, inventory_update: sch
     db.refresh(inventory)  
     return inventory
 
+#material_inven_management Delete
 def delete_material_invens(db: Session, inventory_id: int):
     inventory = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.id == inventory_id).first()
     
