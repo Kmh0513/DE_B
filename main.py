@@ -1,10 +1,9 @@
 
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-import crud, schemas
+import crud, schemas, datetime
 from database import get_db
 from typing import List
-import datetime
 
 app = FastAPI()
 @app.get("/")
@@ -199,6 +198,7 @@ def delete_in_out(material_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Material not found")
     return {"detail": "Material deleted"}
 
+#material_inven_management 엔드포인트
 @app.post("/material_invens/", response_model=schemas.MaterialInvenManagementCreate)
 def create_material_inventory(inventory: schemas.MaterialInvenManagementCreate, db: Session = Depends(get_db)):
     return crud.create_material_invens(db=db, inventory=inventory)
@@ -221,7 +221,7 @@ def get_month_material_inventories(year: int, month: int, db: Session = Depends(
 
 @app.get("/material_invens/predict/")
 def get_material_invens_forecast(forecast_months: int, db: Session = Depends(get_db)):
-    forecast = crud.predict_material_invens(db, forecast_months)
+    forecast = crud.get_predict_material_invens(db, forecast_months)
     if not forecast:
         raise HTTPException(status_code=404, detail="Forecast not found")
     return {"forecast_months": forecast_months, "predicted_material_invens": forecast}
