@@ -70,14 +70,14 @@ def insert_production_data(db: Session, production_data: ProductionCreate):
 
 #inventory generate
 def generate_random_inventory_data(db: Session):
-    item_number_query = db.query(Production.item_number).order_by(Production.id.desc()).first()
+    item_number_query = db.query(Production.item_number).order_by(Production.production_idx.desc()).first()
     item_number = item_number_query[0] if item_number_query else None
-    item_name_query = db.query(Production.item_name).filter(Production.item_number == item_number).order_by(Production.id.desc()).first()
+    item_name_query = db.query(Production.item_name).filter(Production.item_number == item_number).order_by(Production.production_idx.desc()).first()
     item_name = item_name_query[0] if item_name_query else None
     price = round(random.uniform(10, 100), 2)
-    last_inventory = db.query(InventoryManagement).filter(InventoryManagement.item_number == item_number).order_by(InventoryManagement.id.desc()).first()
+    last_inventory = db.query(InventoryManagement).filter(InventoryManagement.item_number == item_number).order_by(InventoryManagement.inventory_idx.desc()).first()
     basic_quantity = last_inventory.current_quantity if last_inventory else 0
-    produced_quantity_query = db.query(Production.produced_quantity).filter(Production.item_number == item_number).order_by(Production.id.desc()).first()
+    produced_quantity_query = db.query(Production.produced_quantity).filter(Production.item_number == item_number).order_by(Production.production_idx.desc()).first()
     in_quantity = produced_quantity_query[0] if produced_quantity_query else 0
     defective_in_quantity = random.randint(0, in_quantity)
     quantity = basic_quantity+in_quantity-defective_in_quantity
@@ -85,7 +85,7 @@ def generate_random_inventory_data(db: Session):
     quantity2 = quantity-out_quantity
     adjustment_quantity = random.randint(-quantity2, 50)
     current_quantity = quantity2+adjustment_quantity
-    lot_current_quantity_query = db.query(MaterialInven.overall_status_quantity).filter(MaterialInven.item_number == item_number).order_by(MaterialInven.id.desc()).first()
+    lot_current_quantity_query = db.query(MaterialInven.overall_status_quantity).filter(MaterialInven.item_number == item_number).order_by(MaterialInven.materialinven_idx.desc()).first()
     lot_current_quantity = lot_current_quantity_query[0] if lot_current_quantity_query else 0
     basic_amount = basic_quantity * price
     in_amount = in_quantity * price
@@ -140,10 +140,12 @@ def insert_inventory_data(db: Session, Invetory_data: InventoryManagementCreate)
     db.commit()
 
 #material generate
-def generate_random_material_data():
+def generate_random_material_data(db: Session):
     number = random.randint(1, 10)
-    item_number = f"Item_Number{number}"
-    item_name = f"Item{number}"
+    item_number_query = random.choice(db.query(Material.item_number).order_by(Material.material_idx.desc()).all())
+    item_number = item_number_query[0] if item_number_query else None
+    item_name_query = random.choice(db.query(Material.item_name).filter(Material.item_number == item_number).order_by(Material.material_idx.desc()).all())
+    item_name = item_name_query[0] if item_name_query else None
     item_category = random.choice(['원재료', '부재료', '재공품', '제품', '반제품'])
     price = round(random.uniform(10, 100), 2)
     process = random.choice(["검사/조립", "사출"])
@@ -184,14 +186,14 @@ def insert_material_data(db: Session, Material_data: MaterialInvenCreate):
     db.commit()
 
 def generate_random_material_inventory_data(db: Session):
-    item_number_query = random.choice(db.query(Material.item_number).order_by(Material.id.desc()).all())
+    item_number_query = random.choice(db.query(Material.item_number).order_by(Material.material_idx.desc()).all())
     item_number = item_number_query[0] if item_number_query else None
-    item_name_query = random.choice(db.query(Material.item_name).filter(Material.item_number == item_number).order_by(Material.id.desc()).all())
+    item_name_query = random.choice(db.query(Material.item_name).filter(Material.item_number == item_number).order_by(Material.material_idx.desc()).all())
     item_name = item_name_query[0] if item_name_query else None
     price = round(random.uniform(10, 100), 2)
-    last_inventory = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.item_number == item_number).order_by(MaterialInvenManagement.id.desc()).first()
+    last_inventory = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.item_number == item_number).order_by(MaterialInvenManagement.materialinvenmanage_idx.desc()).first()
     basic_quantity = last_inventory.current_quantity if last_inventory else 0
-    produced_quantity_query = db.query(Material.quantity).filter(Material.item_number == item_number).order_by(Material.id.desc()).first()
+    produced_quantity_query = db.query(Material.quantity).filter(Material.item_number == item_number).order_by(Material.material_idx.desc()).first()
     in_quantity = produced_quantity_query[0] if produced_quantity_query else 0
     defective_in_quantity = random.randint(0, in_quantity)
     quantity = basic_quantity+in_quantity-defective_in_quantity
@@ -199,7 +201,7 @@ def generate_random_material_inventory_data(db: Session):
     quantity2 = quantity-out_quantity
     adjustment_quantity = random.randint(-quantity2, 50)
     current_quantity = quantity2+adjustment_quantity
-    lot_current_quantity_query = db.query(MaterialInven.overall_status_quantity).filter(MaterialInven.item_number == item_number).order_by(MaterialInven.id.desc()).first()
+    lot_current_quantity_query = db.query(MaterialInven.overall_status_quantity).filter(MaterialInven.item_number == item_number).order_by(MaterialInven.materialinven_idx.desc()).first()
     lot_current_quantity = lot_current_quantity_query[0] if lot_current_quantity_query else 0
     basic_amount = basic_quantity * price
     in_amount = in_quantity * price
@@ -259,7 +261,7 @@ def main():
         while True:
             production_data = generate_random_production_data()
             insert_production_data(db, production_data)
-            material_LOT_data = generate_random_material_data()
+            material_LOT_data = generate_random_material_data(db)
             insert_material_data(db, material_LOT_data)
             material_inven_data = generate_random_material_inventory_data(db)
             insert_material_inventory_data(db, material_inven_data)
