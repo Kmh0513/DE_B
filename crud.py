@@ -150,7 +150,7 @@ def create_production(db: Session, production: schemas.ProductionCreate):
     return db_production.__dict__
 
 def get_production(db: Session, production_id: int):
-    production_get = db.query(Production).filter(Production.id == production_id).first()
+    production_get = db.query(Production).filter(Production.production_idx == production_id).first()
     return  production_get
 
 def get_production_year(db: Session, year: int):
@@ -212,12 +212,12 @@ def get_days_production(db: Session, start_date: datetime.date, end_date: dateti
 
 #특정날짜 production반환
 def get_day_production(db: Session, date: datetime.date):
-    production_get = db.query(Production).filter(Production.date == date).order_by(desc(Production.id)).all()
+    production_get = db.query(Production).filter(Production.date == date).order_by(desc(Production.production_idx)).all()
     return [production.__dict__ for production in production_get]
 
 #production Upadate
 def update_production(db: Session, production_id: int, production_update: schemas.ProductionUpdate):
-    production = db.query(Production).filter(Production.id == production_id).first()
+    production = db.query(Production).filter(Production.production_idx == production_id).first()
     
     if not production:
         return None  
@@ -231,7 +231,7 @@ def update_production(db: Session, production_id: int, production_update: schema
 
 #production Delete
 def delete_production(db: Session, production_id: int):
-    production = db.query(Production).filter(Production.id == production_id).first()
+    production = db.query(Production).filter(Production.production_idx == production_id).first()
     
     if not production:
         return None
@@ -269,7 +269,7 @@ def create_inventory_management(db: Session, inventory: schemas.InventoryManagem
     return db_inventory.__dict__
 
 def get_inventory(db: Session, inventory_id: int):
-    inventory_get = db.query(InventoryManagement).filter(InventoryManagement.id == inventory_id).first()
+    inventory_get = db.query(InventoryManagement).filter(InventoryManagement.inventory_idx == inventory_id).first()
     return  inventory_get
     
 #inventory전체
@@ -278,12 +278,12 @@ def get_all_inventories(db: Session):
     return [inventory.__dict__ for inventory in inventory_get]
 
 def get_month_inventory(db: Session, year: int, month: int):
-    inventory_get = db.query(InventoryManagement).filter(extract('year', InventoryManagement.date) == year, extract('month', InventoryManagement.date) == month).order_by(desc(InventoryManagement.id)).all()
+    inventory_get = db.query(InventoryManagement).filter(extract('year', InventoryManagement.date) == year, extract('month', InventoryManagement.date) == month).order_by(desc(InventoryManagement.inventory_idx)).all()
     return [inventory.__dict__ for inventory in inventory_get]
 
 #inventory_management Update
 def update_inventory(db: Session, inventory_id: int, inventory_update: schemas.InventoryManagementUpdate):
-    inventory = db.query(InventoryManagement).filter(InventoryManagement.id == inventory_id).first()
+    inventory = db.query(InventoryManagement).filter(InventoryManagement.inventory_idx == inventory_id).first()
     
     if not inventory:
         return None  
@@ -297,7 +297,7 @@ def update_inventory(db: Session, inventory_id: int, inventory_update: schemas.I
 
 #inventory_management Delete
 def delete_inventory(db: Session, inventory_id: int):
-    inventory = db.query(InventoryManagement).filter(InventoryManagement.id == inventory_id).first()
+    inventory = db.query(InventoryManagement).filter(InventoryManagement.inventory_idx == inventory_id).first()
     
     if not inventory:
         return None

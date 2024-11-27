@@ -75,7 +75,7 @@ class ProductionCreate(BaseModel):
     account_idx: int = 1
 
 class ProductionBase(BaseModel):
-    id: int
+    production_idx: int
     date: date
     line: Optional[str] = None
     operator: Optional[str] = None
@@ -140,7 +140,7 @@ class InventoryManagementCreate(BaseModel):
     account_idx: int = 1
 
 class InventoryManagementBase(BaseModel):
-    id: int
+    inventory_idx: int
     date: date
     item_number: str
     item_name: str
