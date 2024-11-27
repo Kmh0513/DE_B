@@ -207,7 +207,7 @@ def get_days_production(db: Session, start_date: datetime.date, end_date: dateti
     if item_name:
         querys = querys.filter(Production.item_name == item_name)
     
-    production_get = querys.order_by(desc(Production.id)).all()
+    production_get = querys.order_by(desc(Production.production_idx)).all()
     return [production.__dict__ for production in production_get]
 
 #특정날짜 production반환
