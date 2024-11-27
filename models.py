@@ -18,7 +18,7 @@ class Plan(Base):
 class Production(Base):
     __tablename__ = "productions"
 
-    id = Column(Integer, primary_key=True, index=True)
+    production_idx = Column(Integer, primary_key=True, index=True)
     date = Column(Date)
     line = Column(String)
     operator = Column(String(100))
@@ -39,7 +39,7 @@ class Production(Base):
 class InventoryManagement(Base):
     __tablename__ = "inventory_managements"
 
-    id = Column(Integer, primary_key=True, index=True)
+    inventory_idx = Column(Integer, primary_key=True, index=True)
     date = Column(Date)
     item_number = Column(String(100))
     item_name = Column(String(100))
