@@ -511,7 +511,7 @@ def get_all_material_invens(db: Session):
     return [material_invens.__dict__ for material_invens in material_invens_get]
 
 def get_month_material_invens(db: Session, year: int, month: int):
-    material_invens_get = db.query(MaterialInvenManagement).filter(extract('year', MaterialInvenManagement.date) == year, extract('month', MaterialInvenManagement.date) == month).order_by(desc(MaterialInvenManagement.id)).all()
+    material_invens_get = db.query(MaterialInvenManagement).filter(extract('year', MaterialInvenManagement.date) == year, extract('month', MaterialInvenManagement.date) == month).order_by(desc(MaterialInvenManagement.materialinvenmanage_idx)).all()
     return [material_invens.__dict__ for material_invens in material_invens_get]
 
 def get_predict_material_invens(db: Session, forecast_months: int):
