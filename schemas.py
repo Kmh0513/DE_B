@@ -14,7 +14,7 @@ class PlanCreate(BaseModel):
     account_idx: int = 1
 
 class PlanBase(BaseModel):
-    plane_idx: int
+    plan_idx: int
     year: int
     month: int
     item_number: str
