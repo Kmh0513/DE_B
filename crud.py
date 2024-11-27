@@ -100,7 +100,7 @@ def get_plan_rate_for_month(db: Session, year: int, month: int):
 
 #plan Update
 def update_plan(db: Session, plan_id: int, plan_update: schemas.PlanUpdate):
-    plan = db.query(Plan).filter(Plan.id == plan_id).first()
+    plan = db.query(Plan).filter(Plan.plan_idx == plan_id).first()
     
     if not plan:
         return None  
@@ -114,7 +114,7 @@ def update_plan(db: Session, plan_id: int, plan_update: schemas.PlanUpdate):
 
 #plan Delete
 def delete_plan(db: Session, plan_id: int):
-    plan = db.query(Plan).filter(Plan.id == plan_id).first()
+    plan = db.query(Plan).filter(Plan.plan_idx == plan_id).first()
     
     if not plan:
         return None
@@ -332,7 +332,7 @@ def get_all_materials(db: Session):
 
 #material Update
 def update_material(db: Session, material_id: int, material_update: schemas.MaterialUpdate):
-    material = db.query(Material).filter(Material.id == material_id).first()
+    material = db.query(Material).filter(Material.material_idx == material_id).first()
     
     if not material:
         return None  
@@ -346,7 +346,7 @@ def update_material(db: Session, material_id: int, material_update: schemas.Mate
 
 #material Delete
 def delete_material(db: Session, material_id: int):
-    material = db.query(Material).filter(Material.id == material_id).first()
+    material = db.query(Material).filter(Material.material_idx == material_id).first()
     
     if not material:
         return None
@@ -390,14 +390,14 @@ def get_material_rate_for_month(db: Session, year: int, month: int):
     previous_year = year - 1 if month == 1 else year
     previous_start_date = datetime(previous_year, previous_month, 1)
     previous_end_date = datetime(year, month, 1) - timedelta(days=1)
-    current_data = db.query(func.sum(Material.quantity*MaterialInven.price).label("current_amount"), Material.client)\
-        .select_from(MaterialInven)\
-        .join(Material, Material.item_name == MaterialInven.item_name)\
+    current_data = db.query(func.sum(Material.quantity*MaterialInvenManagement.price).label("current_amount"), Material.client)\
+        .select_from(MaterialInvenManagement)\
+        .join(Material, Material.item_name == MaterialInvenManagement.item_name)\
         .filter(Material.date >= current_start_date, Material.date <= current_end_date)\
         .group_by(Material.client).all()
-    previous_data = db.query(func.sum(Material.quantity*MaterialInven.price).label("previous_amount"), Material.client)\
-        .select_from(MaterialInven)\
-        .join(Material, Material.item_name == MaterialInven.item_name)\
+    previous_data = db.query(func.sum(Material.quantity*MaterialInvenManagement.price).label("previous_amount"), Material.client)\
+        .select_from(MaterialInvenManagement)\
+        .join(Material, Material.item_name == MaterialInvenManagement.item_name)\
         .filter(Material.date >= previous_start_date, Material.date <= previous_end_date)\
         .group_by(Material.client).all()
     previous_map = {data.client: data.previous_amount for data in previous_data}
@@ -451,7 +451,7 @@ def get_all_materials_in_out(db: Session):
 
 #material_in_out_management Update
 def update_material_in_out(db: Session, material_id: int, material_update: schemas.MaterialInOutManagementUpdate):
-    material = db.query(MaterialInOutManagement).filter(MaterialInOutManagement.id == material_id).first()
+    material = db.query(MaterialInOutManagement).filter(MaterialInOutManagement.materialinout_idx == material_id).first()
     
     if not material:
         return None  
@@ -465,7 +465,7 @@ def update_material_in_out(db: Session, material_id: int, material_update: schem
 
 #material_in_out_management Delete
 def delete_material_in_out(db: Session, material_id: int):
-    material = db.query(MaterialInOutManagement).filter(MaterialInOutManagement.id == material_id).first()
+    material = db.query(MaterialInOutManagement).filter(MaterialInOutManagement.materialinout_idx == material_id).first()
     
     if not material:
         return None
@@ -502,7 +502,7 @@ def create_material_invens(db: Session, inventory: schemas.MaterialInvenManageme
     return db_inventory.__dict__
 
 def get_material_invens(db: Session, material_invens_id: int):
-    material_invens_get = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.id == material_invens_id).first()
+    material_invens_get = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.materialinvenmanage_idx == material_invens_id).first()
     return  material_invens_get
     
 #material_inven_management전체
@@ -530,7 +530,7 @@ def get_predict_material_invens(db: Session, forecast_months: int):
 
 #material_inven_management Update
 def update_material_invens(db: Session, inventory_id: int, inventory_update: schemas.MaterialInvenManagementUpdate):
-    inventory = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.id == inventory_id).first()
+    inventory = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.materialinvenmanage_idx == inventory_id).first()
     
     if not inventory:
         return None  
@@ -544,7 +544,7 @@ def update_material_invens(db: Session, inventory_id: int, inventory_update: sch
 
 #material_inven_management Delete
 def delete_material_invens(db: Session, inventory_id: int):
-    inventory = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.id == inventory_id).first()
+    inventory = db.query(MaterialInvenManagement).filter(MaterialInvenManagement.materialinvenmanage_idx == inventory_id).first()
     
     if not inventory:
         return None

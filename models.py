@@ -4,7 +4,7 @@ from database import Base
 class Plan(Base):
     __tablename__ = "plans"
 
-    id = Column(Integer, primary_key=True, index=True)
+    plan_idx = Column(Integer, primary_key=True, index=True)
     year = Column(Integer)
     month = Column(Integer)
     item_number = Column(String(100))
@@ -62,7 +62,7 @@ class InventoryManagement(Base):
 class Material(Base):
     __tablename__ = "materials"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    material_idx = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(Date)
     client = Column(String(100))
     item_number = Column(String(100))
@@ -76,7 +76,7 @@ class Material(Base):
 class MaterialInven(Base):
     __tablename__ = "material_invens"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    materialinven_idx = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(Date)
     item_number = Column(String(100))
     item_name = Column(String(100))
@@ -92,7 +92,7 @@ class MaterialInven(Base):
 class MaterialInOutManagement(Base):
     __tablename__ = "material_in_out_managements"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    materialinout_idx = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(Date)
     statement_number = Column(String(100))
     client = Column(String(100))
@@ -108,7 +108,7 @@ class MaterialInOutManagement(Base):
 class MaterialInvenManagement(Base):
     __tablename__ = "material_invens_managements"
 
-    id = Column(Integer, primary_key=True, index=True)
+    materialinvenmanage_idx = Column(Integer, primary_key=True, index=True)
     date = Column(Date)
     item_number = Column(String(100))
     item_name = Column(String(100))

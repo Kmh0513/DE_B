@@ -14,7 +14,7 @@ class PlanCreate(BaseModel):
     account_idx: int = 1
 
 class PlanBase(BaseModel):
-    id: int
+    plane_idx: int
     year: int
     month: int
     item_number: str
@@ -194,7 +194,7 @@ class MaterialCreate(BaseModel):
     account_idx: int = 1
 
 class MaterialBase(BaseModel):
-    id: int
+    material_idx: int
     date: date
     client: str
     item_number: str
@@ -247,7 +247,7 @@ class MaterialInvenCreate(BaseModel):
     account_idx: int = 1
 
 class MaterialInvenBase(BaseModel):
-    id:int
+    materialinven_idx:int
     date: date
     item_number: str
     item_name: str
@@ -274,7 +274,7 @@ class MaterialInOutManagementCreate(BaseModel):
     account_idx: int = 1
 
 class MaterialInOutManagementBase(BaseModel):
-    id: int
+    materialinout_idx: int
     date: date
     statement_number: str
     client: str
@@ -323,7 +323,7 @@ class MaterialInvenManagementCreate(BaseModel):
     account_idx: int = 1
 
 class MaterialInvenManagementBase(BaseModel):
-    id: int
+    materialinvenmanage_idx: int
     date: date
     item_number: str
     item_name: str
